@@ -88,26 +88,40 @@ export default function PersonalizarPage() {
 
   const handleSubmit = async () => {
     try {
-      const requestData = {
-        name: formData.name,
-        email: formData.email,
-        projectType: formData.type as 'bot' | 'site',
-        projectDetails: {
-          category: formData.category,
-          description: formData.description,
-          budget: formData.budget,
-          deadline: formData.deadline,
-          platform: formData.platform,
-          features: formData.features
-        },
-        status: 'pending' as const,
-        priority: 'medium' as const
-      }
-
       if (formData.type === 'bot') {
-        await createBotRequest(requestData)
+        const botRequestData = {
+          name: formData.name,
+          email: formData.email,
+          projectType: 'bot' as const,
+          projectDetails: {
+            category: formData.category,
+            description: formData.description,
+            budget: formData.budget,
+            deadline: formData.deadline,
+            platform: formData.platform,
+            features: formData.features
+          },
+          status: 'pending' as const,
+          priority: 'medium' as const
+        }
+        await createBotRequest(botRequestData)
       } else {
-        await createSiteRequest(requestData)
+        const siteRequestData = {
+          name: formData.name,
+          email: formData.email,
+          projectType: 'site' as const,
+          projectDetails: {
+            category: formData.category,
+            description: formData.description,
+            budget: formData.budget,
+            deadline: formData.deadline,
+            platform: formData.platform,
+            features: formData.features
+          },
+          status: 'pending' as const,
+          priority: 'medium' as const
+        }
+        await createSiteRequest(siteRequestData)
       }
       
       // Mostrar modal de sucesso
