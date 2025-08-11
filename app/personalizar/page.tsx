@@ -88,7 +88,8 @@ export default function PersonalizarPage() {
 
   const handleSubmit = async () => {
     try {
-      console.log('Submitting form data:', formData)
+      console.log('🚀 Submitting form data:', formData)
+      console.log('🔧 Form type:', formData.type)
       if (formData.type === 'bot') {
         const botRequestData = {
           name: formData.name,
