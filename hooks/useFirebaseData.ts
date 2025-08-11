@@ -1,0 +1,569 @@
+"use client"
+
+import { useState, useEffect } from 'react'
+import FirebaseDataService, { 
+  SiteConfig, 
+  BotCategory, 
+  SiteCategory, 
+  BotType, 
+  ProjectType, 
+  CustomizationOption, 
+  Order, 
+  Pricing 
+} from '@/lib/firebase-data-service'
+
+const firebaseService = FirebaseDataService.getInstance()
+
+export function useSiteConfig() {
+  const [config, setConfig] = useState<SiteConfig | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    console.log('🔄 useSiteConfig: Configurando listener...')
+    const unsubscribe = firebaseService.onSiteConfigChange((newConfig) => {
+      console.log('🔧 SiteConfig atualizado:', newConfig)
+      console.log('🔧 Config anterior:', config)
+      setConfig(newConfig)
+      setLoading(false)
+      setError(null)
+    })
+
+    return () => {
+      console.log('🔄 useSiteConfig: Removendo listener...')
+      unsubscribe()
+    }
+  }, [])
+
+  const updateConfig = async (updates: Partial<SiteConfig>) => {
+    try {
+      console.log('🔄 useSiteConfig: updateConfig chamado com:', updates)
+      setError(null)
+      const success = await firebaseService.updateSiteConfig(updates)
+      console.log('🔄 useSiteConfig: updateSiteConfig retornou:', success)
+      if (!success) {
+        setError('Erro ao atualizar configuração')
+      }
+      return success
+    } catch (err) {
+      console.error('❌ useSiteConfig: Erro ao atualizar:', err)
+      setError('Erro ao atualizar configuração')
+      return false
+    }
+  }
+
+  return { config, loading, error, updateConfig }
+}
+
+export function useOrders() {
+  const [orders, setOrders] = useState<Order[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const unsubscribe = firebaseService.onOrdersChange((newOrders) => {
+      setOrders(newOrders)
+      setLoading(false)
+      setError(null)
+    })
+
+    return () => unsubscribe()
+  }, [])
+
+  const addOrder = async (order: Omit<Order, 'id' | 'createdAt' | 'updatedAt'>) => {
+    try {
+      setError(null)
+      const id = await firebaseService.addOrder(order)
+      return id
+    } catch (err) {
+      setError('Erro ao adicionar pedido')
+      return null
+    }
+  }
+
+  const updateOrder = async (id: string, updates: Partial<Order>) => {
+    try {
+      setError(null)
+      const success = await firebaseService.updateOrder(id, updates)
+      if (!success) {
+        setError('Erro ao atualizar pedido')
+      }
+      return success
+    } catch (err) {
+      setError('Erro ao atualizar pedido')
+      return false
+    }
+  }
+
+  const deleteOrder = async (id: string) => {
+    try {
+      setError(null)
+      const success = await firebaseService.deleteOrder(id)
+      if (!success) {
+        setError('Erro ao deletar pedido')
+      }
+      return success
+    } catch (err) {
+      setError('Erro ao deletar pedido')
+      return false
+    }
+  }
+
+  return { orders, loading, error, addOrder, updateOrder, deleteOrder }
+}
+
+export function useBotCategories() {
+  const [categories, setCategories] = useState<BotCategory[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const unsubscribe = firebaseService.onBotCategoriesChange((newCategories) => {
+      setCategories(newCategories)
+      setLoading(false)
+      setError(null)
+    })
+
+    return () => unsubscribe()
+  }, [])
+
+  const addCategory = async (category: Omit<BotCategory, 'id' | 'createdAt' | 'updatedAt'>) => {
+    try {
+      setError(null)
+      const id = await firebaseService.addBotCategory(category)
+      return id
+    } catch (err) {
+      setError('Erro ao adicionar categoria')
+      return null
+    }
+  }
+
+  const updateCategory = async (id: string, updates: Partial<BotCategory>) => {
+    try {
+      setError(null)
+      const success = await firebaseService.updateBotCategory(id, updates)
+      if (!success) {
+        setError('Erro ao atualizar categoria')
+      }
+      return success
+    } catch (err) {
+      setError('Erro ao atualizar categoria')
+      return false
+    }
+  }
+
+  const deleteCategory = async (id: string) => {
+    try {
+      setError(null)
+      const success = await firebaseService.deleteBotCategory(id)
+      if (!success) {
+        setError('Erro ao deletar categoria')
+      }
+      return success
+    } catch (err) {
+      setError('Erro ao deletar categoria')
+      return false
+    }
+  }
+
+  return { categories, loading, error, addCategory, updateCategory, deleteCategory }
+}
+
+export function useSiteCategories() {
+  const [categories, setCategories] = useState<SiteCategory[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const unsubscribe = firebaseService.onSiteCategoriesChange((newCategories) => {
+      setCategories(newCategories)
+      setLoading(false)
+      setError(null)
+    })
+
+    return () => unsubscribe()
+  }, [])
+
+  const addCategory = async (category: Omit<SiteCategory, 'id' | 'createdAt' | 'updatedAt'>) => {
+    try {
+      setError(null)
+      const id = await firebaseService.addSiteCategory(category)
+      return id
+    } catch (err) {
+      setError('Erro ao adicionar categoria')
+      return null
+    }
+  }
+
+  const updateCategory = async (id: string, updates: Partial<SiteCategory>) => {
+    try {
+      setError(null)
+      const success = await firebaseService.updateSiteCategory(id, updates)
+      if (!success) {
+        setError('Erro ao atualizar categoria')
+      }
+      return success
+    } catch (err) {
+      setError('Erro ao atualizar categoria')
+      return false
+    }
+  }
+
+  const deleteCategory = async (id: string) => {
+    try {
+      setError(null)
+      const success = await firebaseService.deleteSiteCategory(id)
+      if (!success) {
+        setError('Erro ao deletar categoria')
+      }
+      return success
+    } catch (err) {
+      setError('Erro ao deletar categoria')
+      return false
+    }
+  }
+
+  return { categories, loading, error, addCategory, updateCategory, deleteCategory }
+}
+
+export function useBotTypes() {
+  const [types, setTypes] = useState<BotType[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const unsubscribe = firebaseService.onBotTypesChange((newTypes) => {
+      setTypes(newTypes)
+      setLoading(false)
+      setError(null)
+    })
+
+    return () => unsubscribe()
+  }, [])
+
+  const addType = async (type: Omit<BotType, 'id' | 'createdAt' | 'updatedAt'>) => {
+    try {
+      setError(null)
+      const id = await firebaseService.addBotType(type)
+      return id
+    } catch (err) {
+      setError('Erro ao adicionar tipo')
+      return null
+    }
+  }
+
+  const updateType = async (id: string, updates: Partial<BotType>) => {
+    try {
+      setError(null)
+      const success = await firebaseService.updateBotType(id, updates)
+      if (!success) {
+        setError('Erro ao atualizar tipo')
+      }
+      return success
+    } catch (err) {
+      setError('Erro ao atualizar tipo')
+      return false
+    }
+  }
+
+  const deleteType = async (id: string) => {
+    try {
+      setError(null)
+      const success = await firebaseService.deleteBotType(id)
+      if (!success) {
+        setError('Erro ao deletar tipo')
+      }
+      return success
+    } catch (err) {
+      setError('Erro ao deletar tipo')
+      return false
+    }
+  }
+
+  return { types, loading, error, addType, updateType, deleteType }
+}
+
+export function useProjectTypes() {
+  const [types, setTypes] = useState<ProjectType[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const unsubscribe = firebaseService.onProjectTypesChange((newTypes) => {
+      setTypes(newTypes)
+      setLoading(false)
+      setError(null)
+    })
+
+    return () => unsubscribe()
+  }, [])
+
+  const addType = async (type: Omit<ProjectType, 'id' | 'createdAt' | 'updatedAt'>) => {
+    try {
+      setError(null)
+      const id = await firebaseService.addProjectType(type)
+      return id
+    } catch (err) {
+      setError('Erro ao adicionar tipo')
+      return null
+    }
+  }
+
+  const updateType = async (id: string, updates: Partial<ProjectType>) => {
+    try {
+      setError(null)
+      const success = await firebaseService.updateProjectType(id, updates)
+      if (!success) {
+        setError('Erro ao atualizar tipo')
+      }
+      return success
+    } catch (err) {
+      setError('Erro ao atualizar tipo')
+      return false
+    }
+  }
+
+  const deleteType = async (id: string) => {
+    try {
+      setError(null)
+      const success = await firebaseService.deleteProjectType(id)
+      if (!success) {
+        setError('Erro ao deletar tipo')
+      }
+      return success
+    } catch (err) {
+      setError('Erro ao deletar tipo')
+      return false
+    }
+  }
+
+  return { types, loading, error, addType, updateType, deleteType }
+}
+
+export function useCustomizationOptions() {
+  const [options, setOptions] = useState<CustomizationOption[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const unsubscribe = firebaseService.onCustomizationOptionsChange((newOptions) => {
+      setOptions(newOptions)
+      setLoading(false)
+      setError(null)
+    })
+
+    return () => unsubscribe()
+  }, [])
+
+  const addOption = async (option: Omit<CustomizationOption, 'id' | 'createdAt' | 'updatedAt'>) => {
+    try {
+      setError(null)
+      const id = await firebaseService.addCustomizationOption(option)
+      return id
+    } catch (err) {
+      setError('Erro ao adicionar opção')
+      return null
+    }
+  }
+
+  const updateOption = async (id: string, updates: Partial<CustomizationOption>) => {
+    try {
+      setError(null)
+      const success = await firebaseService.updateCustomizationOption(id, updates)
+      if (!success) {
+        setError('Erro ao atualizar opção')
+      }
+      return success
+    } catch (err) {
+      setError('Erro ao atualizar opção')
+      return false
+    }
+  }
+
+  const deleteOption = async (id: string) => {
+    try {
+      setError(null)
+      const success = await firebaseService.deleteCustomizationOption(id)
+      if (!success) {
+        setError('Erro ao deletar opção')
+      }
+      return success
+    } catch (err) {
+      setError('Erro ao deletar opção')
+      return false
+    }
+  }
+
+  return { options, loading, error, addOption, updateOption, deleteOption }
+}
+
+export function usePricing() {
+  const [pricing, setPricing] = useState<Pricing[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const unsubscribe = firebaseService.onPricingChange((newPricing) => {
+      setPricing(newPricing)
+      setLoading(false)
+      setError(null)
+    })
+
+    return () => unsubscribe()
+  }, [])
+
+  const addPricing = async (pricingItem: Omit<Pricing, 'id' | 'createdAt' | 'updatedAt'>) => {
+    try {
+      setError(null)
+      const id = await firebaseService.addPricing(pricingItem)
+      return id
+    } catch (err) {
+      setError('Erro ao adicionar preço')
+      return null
+    }
+  }
+
+  const updatePricing = async (id: string, updates: Partial<Pricing>) => {
+    try {
+      setError(null)
+      const success = await firebaseService.updatePricing(id, updates)
+      if (!success) {
+        setError('Erro ao atualizar preço')
+      }
+      return success
+    } catch (err) {
+      setError('Erro ao atualizar preço')
+      return false
+    }
+  }
+
+  const deletePricing = async (id: string) => {
+    try {
+      setError(null)
+      const success = await firebaseService.deletePricing(id)
+      if (!success) {
+        setError('Erro ao deletar preço')
+      }
+      return success
+    } catch (err) {
+      setError('Erro ao deletar preço')
+      return false
+    }
+  }
+
+  return { pricing, loading, error, addPricing, updatePricing, deletePricing }
+}
+
+export function useServices() {
+  const [services, setServices] = useState<Service[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const unsubscribe = firebaseService.onServicesChange((newServices) => {
+      setServices(newServices)
+      setLoading(false)
+      setError(null)
+    })
+
+    return () => unsubscribe()
+  }, [])
+
+  const addService = async (serviceItem: Omit<Service, 'id' | 'createdAt' | 'updatedAt'>) => {
+    try {
+      setError(null)
+      const id = await firebaseService.addService(serviceItem)
+      return id
+    } catch (err) {
+      setError('Erro ao adicionar serviço')
+      return null
+    }
+  }
+
+  const updateService = async (id: string, updates: Partial<Service>) => {
+    try {
+      setError(null)
+      const success = await firebaseService.updateService(id, updates)
+      if (!success) {
+        setError('Erro ao atualizar serviço')
+      }
+      return success
+    } catch (err) {
+      setError('Erro ao atualizar serviço')
+      return false
+    }
+  }
+
+  const deleteService = async (id: string) => {
+    try {
+      setError(null)
+      const success = await firebaseService.deleteService(id)
+      if (!success) {
+        setError('Erro ao deletar serviço')
+      }
+      return success
+    } catch (err) {
+      setError('Erro ao deletar serviço')
+      return false
+    }
+  }
+
+  return { services, loading, error, addService, updateService, deleteService }
+}
+
+export function usePlans() {
+  const [plans, setPlans] = useState<Plan[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const unsubscribe = firebaseService.onPlansChange((newPlans) => {
+      setPlans(newPlans)
+      setLoading(false)
+      setError(null)
+    })
+
+    return () => unsubscribe()
+  }, [])
+
+  const addPlan = async (planItem: Omit<Plan, 'id' | 'createdAt' | 'updatedAt'>) => {
+    try {
+      setError(null)
+      const id = await firebaseService.addPlan(planItem)
+      return id
+    } catch (err) {
+      setError('Erro ao adicionar plano')
+      return null
+    }
+  }
+
+  const updatePlan = async (id: string, updates: Partial<Plan>) => {
+    try {
+      setError(null)
+      const success = await firebaseService.updatePlan(id, updates)
+      if (!success) {
+        setError('Erro ao atualizar plano')
+      }
+      return success
+    } catch (err) {
+      setError('Erro ao atualizar plano')
+      return false
+    }
+  }
+
+  const deletePlan = async (id: string) => {
+    try {
+      setError(null)
+      const success = await firebaseService.deletePlan(id)
+      if (!success) {
+        setError('Erro ao deletar plano')
+      }
+      return success
+    } catch (err) {
+      setError('Erro ao deletar plano')
+      return false
+    }
+  }
+
+  return { plans, loading, error, addPlan, updatePlan, deletePlan }
+}
