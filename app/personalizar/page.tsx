@@ -497,7 +497,13 @@ export default function PersonalizarPage() {
 
       {/* Demo do Projeto */}
       <GeneralDemo 
-        formData={formData}
+        formData={{
+          projectType: formData.type as "bot" | "site",
+          category: formData.category,
+          description: formData.description,
+          platform: formData.platform,
+          features: formData.features
+        }}
         isOpen={showDemo}
         onClose={() => setShowDemo(false)}
       />
