@@ -94,12 +94,12 @@ export default function PersonalizarPage() {
           email: formData.email,
           projectType: 'bot' as const,
           projectDetails: {
-            category: formData.category,
-            description: formData.description,
-            budget: formData.budget,
-            deadline: formData.deadline,
+            types: [formData.category],
             platform: formData.platform,
-            features: formData.features
+            description: formData.description,
+            features: Array.isArray(formData.features) ? formData.features : [formData.features],
+            budget: formData.budget,
+            deadline: formData.deadline
           },
           status: 'pending' as const,
           priority: 'medium' as const
@@ -111,12 +111,10 @@ export default function PersonalizarPage() {
           email: formData.email,
           projectType: 'site' as const,
           projectDetails: {
-            category: formData.category,
             description: formData.description,
+            features: Array.isArray(formData.features) ? formData.features : [formData.features],
             budget: formData.budget,
-            deadline: formData.deadline,
-            platform: formData.platform,
-            features: formData.features
+            deadline: formData.deadline
           },
           status: 'pending' as const,
           priority: 'medium' as const
