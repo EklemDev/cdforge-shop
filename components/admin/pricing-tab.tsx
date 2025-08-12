@@ -352,7 +352,7 @@ export default function PricingTab({
                       {item.currency === 'BRL' ? 'R$' : item.currency === 'USD' ? '$' : '€'}
                       {item.price.toFixed(2)}
                     </span>
-                    {item.originalPrice > item.price && (
+                    {item.originalPrice && item.originalPrice > item.price && (
                       <span className="text-gray-500 line-through">
                         {item.currency === 'BRL' ? 'R$' : item.currency === 'USD' ? '$' : '€'}
                         {item.originalPrice.toFixed(2)}
