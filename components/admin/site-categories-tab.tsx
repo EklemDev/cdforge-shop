@@ -16,7 +16,7 @@ import {
   Save,
   X
 } from "lucide-react"
-import { SiteCategory } from "@/lib/admin-data"
+import { SiteCategory } from "@/lib/firebase-data-service"
 
 interface SiteCategoriesTabProps {
   categories: SiteCategory[]

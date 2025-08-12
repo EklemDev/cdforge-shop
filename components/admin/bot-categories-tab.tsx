@@ -17,7 +17,7 @@ import {
   Save,
   X
 } from "lucide-react"
-import { BotCategory } from "@/lib/admin-data"
+import { BotCategory } from "@/lib/firebase-data-service"
 
 interface BotCategoriesTabProps {
   categories: BotCategory[]

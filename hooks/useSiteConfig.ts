@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useAdminData, SiteConfig } from "@/lib/admin-data"
+import { SiteConfig } from "@/lib/firebase-data-service"
 
 export function useSiteConfig() {
   const adminData = useAdminData()

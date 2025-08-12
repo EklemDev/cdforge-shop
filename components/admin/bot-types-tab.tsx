@@ -18,7 +18,7 @@ import {
   X,
   Zap
 } from "lucide-react"
-import { BotType } from "@/lib/admin-data"
+import { BotType } from "@/lib/firebase-data-service"
 
 interface BotTypesTabProps {
   botTypes: BotType[]
