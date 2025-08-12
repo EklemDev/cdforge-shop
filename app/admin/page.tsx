@@ -31,6 +31,8 @@ import { useOrders, useSiteConfig, useBotCategories, useSiteCategories, useBotTy
 import OrdersTab from "@/components/admin/orders-tab"
 import SiteConfigTab from "@/components/admin/site-config-tab"
 import ContactsTab from "@/components/admin/contacts-tab"
+import PlansTab from "@/components/admin/plans-tab"
+import PlatformsTab from "@/components/admin/platforms-tab"
 import BotCategoriesTab from "@/components/admin/bot-categories-tab"
 import SiteCategoriesTab from "@/components/admin/site-categories-tab"
 import BotTypesTab from "@/components/admin/bot-types-tab"
@@ -55,6 +57,10 @@ export default function AdminPage() {
   const { pricing, loading: pricingLoading, addPricing: addPricingItem, updatePricing: updatePricingItem, deletePricing: deletePricingItem } = usePricing()
   const { services, loading: servicesLoading, addService, updateService, deleteService } = useServices()
   const { categories: mainCategories, loading: mainCategoriesLoading, addMainCategory, updateMainCategory, deleteMainCategory } = useMainCategories()
+  
+  // Estados para planos e plataformas
+  const [plans, setPlans] = useState<any[]>([])
+  const [platforms, setPlatforms] = useState<any[]>([])
 
   useEffect(() => {
     // Verificar se o usuário tem acesso de desenvolvedor
@@ -190,9 +196,13 @@ export default function AdminPage() {
               <Phone className="w-4 h-4" />
               Contatos
             </TabsTrigger>
-            <TabsTrigger value="site-config" className="flex items-center gap-2">
+            <TabsTrigger value="plans" className="flex items-center gap-2">
+              <Package className="w-4 h-4" />
+              Planos
+            </TabsTrigger>
+            <TabsTrigger value="platforms" className="flex items-center gap-2">
               <Globe className="w-4 h-4" />
-              Site
+              Plataformas
             </TabsTrigger>
             <TabsTrigger value="services" className="flex items-center gap-2">
               <Settings className="w-4 h-4" />
@@ -202,14 +212,14 @@ export default function AdminPage() {
               <DollarSign className="w-4 h-4" />
               Preços
             </TabsTrigger>
+          </TabsList>
+          
+          {/* Segunda Linha - 6 abas secundárias */}
+          <TabsList className="grid w-full grid-cols-6 gap-2">
             <TabsTrigger value="main-categories" className="flex items-center gap-2">
               <LinkIcon className="w-4 h-4" />
               Categorias
             </TabsTrigger>
-          </TabsList>
-          
-          {/* Segunda Linha - 5 abas secundárias */}
-          <TabsList className="grid w-full grid-cols-5 gap-2">
             <TabsTrigger value="bot-categories" className="flex items-center gap-2">
               <Bot className="w-4 h-4" />
               Categorias Bots
@@ -271,6 +281,20 @@ export default function AdminPage() {
                 updatedAt: null
               }} 
               onUpdate={updateConfig}
+            />
+          </TabsContent>
+
+          <TabsContent value="plans" className="space-y-6">
+            <PlansTab 
+              plans={plans}
+              onUpdate={setPlans}
+            />
+          </TabsContent>
+
+          <TabsContent value="platforms" className="space-y-6">
+            <PlatformsTab 
+              platforms={platforms}
+              onUpdate={setPlatforms}
             />
           </TabsContent>
 
