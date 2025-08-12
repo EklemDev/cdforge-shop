@@ -268,7 +268,9 @@ function PlanForm({
     onSubmit({
       ...formData,
       features: formData.features.filter(f => f.trim() !== ""),
-      limitations: formData.limitations.filter(l => l.trim() !== "")
+      limitations: formData.limitations.filter(l => l.trim() !== ""),
+      order: plan?.order ?? 0,
+      currency: formData.currency || 'BRL'
     })
   }
 
