@@ -180,7 +180,8 @@ export default function AdminPage() {
 
         {/* Tabs Principais */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-11">
+          <TabsList className="grid w-full grid-cols-6 gap-2">
+            {/* Primeira Linha - 6 abas principais */}
             <TabsTrigger value="orders" className="flex items-center gap-2">
               <Package className="w-4 h-4" />
               Pedidos
@@ -193,10 +194,6 @@ export default function AdminPage() {
               <Globe className="w-4 h-4" />
               Site
             </TabsTrigger>
-            <TabsTrigger value="main-categories" className="flex items-center gap-2">
-              <LinkIcon className="w-4 h-4" />
-              Categorias Principais
-            </TabsTrigger>
             <TabsTrigger value="services" className="flex items-center gap-2">
               <Settings className="w-4 h-4" />
               Serviços
@@ -205,6 +202,14 @@ export default function AdminPage() {
               <DollarSign className="w-4 h-4" />
               Preços
             </TabsTrigger>
+            <TabsTrigger value="main-categories" className="flex items-center gap-2">
+              <LinkIcon className="w-4 h-4" />
+              Categorias
+            </TabsTrigger>
+          </TabsList>
+          
+          {/* Segunda Linha - 5 abas secundárias */}
+          <TabsList className="grid w-full grid-cols-5 gap-2">
             <TabsTrigger value="bot-categories" className="flex items-center gap-2">
               <Bot className="w-4 h-4" />
               Categorias Bots
