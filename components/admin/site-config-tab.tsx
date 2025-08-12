@@ -27,6 +27,34 @@ interface SiteConfigTabProps {
   onUpdate: (config: Partial<SiteConfig>) => void
 }
 
+// Configurações padrão originais
+const defaultConfig: Partial<SiteConfig> = {
+  discordLink: 'https://discord.gg/jp2BzA4H',
+  phone: '(11) 11111-1110',
+  email: 'teste2@codeforge.dev',
+  instagram: '@teste2_codeforge',
+  whatsapp: 'https://wa.me/5511111111111',
+  companyName: 'CodeForge',
+  companyDescription: 'Transformando ideias em soluções digitais inovadoras.',
+  address: 'São Paulo, SP',
+  city: 'São Paulo',
+  state: 'SP',
+  country: 'Brasil',
+  maintenanceMode: false,
+  orderNotifications: true,
+  autoBackup: true,
+  siteTitle: 'CodeForge - Desenvolvimento de Bots e Sites',
+  siteDescription: 'Especialistas em desenvolvimento de bots para Discord e WhatsApp, sites e design.',
+  keywords: 'bots, discord, whatsapp, sites, desenvolvimento, design',
+  facebook: '',
+  twitter: '',
+  linkedin: '',
+  youtube: '',
+  businessHours: 'Segunda a Sexta, 9h às 18h',
+  timezone: 'America/Sao_Paulo',
+  currency: 'BRL'
+}
+
 export default function SiteConfigTab({ 
   siteConfig, 
   onUpdate
@@ -70,9 +98,25 @@ export default function SiteConfigTab({
   }
 
   const handleReset = () => {
-    if (confirm("Tem certeza que deseja redefinir todas as configurações para os valores padrão?")) {
-      // Aqui você pode implementar a lógica para resetar para valores padrão
-      alert("Funcionalidade de reset será implementada em breve")
+    if (confirm("⚠️ ATENÇÃO: Tem certeza que deseja redefinir TODAS as configurações para os valores padrão?\n\nEsta ação irá:\n• Restaurar todos os links e contatos\n• Resetar informações da empresa\n• Voltar configurações do sistema\n\nEsta ação NÃO pode ser desfeita!")) {
+      console.log('🔄 SiteConfigTab: Redefinindo configurações para padrão...')
+      
+      // Atualizar o formulário local
+      setFormData({
+        discordLink: defaultConfig.discordLink || '',
+        phone: defaultConfig.phone || '',
+        email: defaultConfig.email || '',
+        instagram: defaultConfig.instagram || '',
+        whatsapp: defaultConfig.whatsapp || ''
+      })
+      
+      // Enviar todas as configurações padrão para o Firebase
+      onUpdate(defaultConfig)
+      
+      // Fechar modo de edição se estiver aberto
+      setIsEditing(false)
+      
+      alert("✅ Configurações redefinidas com sucesso!\n\nTodas as configurações foram restauradas para os valores padrão originais.")
     }
   }
 

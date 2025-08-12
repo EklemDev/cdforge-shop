@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge"
 import { Switch } from "@/components/ui/switch"
 import { useMainCategories } from "@/hooks/useFirebaseData"
 import { MainCategory } from "@/lib/firebase-data-service"
-import { Plus, Edit, Trash2, Eye, EyeOff } from "lucide-react"
+import { Plus, Edit, Trash2, Eye, EyeOff, RefreshCw } from "lucide-react"
 
 interface MainCategoryFormProps {
   category?: MainCategory
@@ -150,6 +150,54 @@ function MainCategoryForm({ category, onSubmit, onCancel }: MainCategoryFormProp
   )
 }
 
+// Categorias principais padrão
+const defaultMainCategories = [
+  {
+    title: "BOTS",
+    description: "Automação inteligente para Discord, WhatsApp, Instagram e Web Scraping",
+    icon: "Bot",
+    href: "/bots",
+    color: "#3B82F6",
+    bgColor: "bg-blue-500",
+    hoverColor: "hover:bg-blue-600",
+    active: true,
+    order: 1,
+  },
+  {
+    title: "SITES",
+    description: "Desenvolvimento web profissional, e-commerce, portfolios e landing pages",
+    icon: "Globe",
+    href: "/sites",
+    color: "#10B981",
+    bgColor: "bg-green-500",
+    hoverColor: "hover:bg-green-600",
+    active: true,
+    order: 2,
+  },
+  {
+    title: "DESIGN",
+    description: "Criação de identidade visual, logos, interfaces e materiais gráficos",
+    icon: "Palette",
+    href: "/design",
+    color: "#8B5CF6",
+    bgColor: "bg-purple-500",
+    hoverColor: "hover:bg-purple-600",
+    active: true,
+    order: 3,
+  },
+  {
+    title: "SERVIÇOS",
+    description: "Análise de Instagram, consultoria especializada e suporte técnico",
+    icon: "Settings",
+    href: "/servicos",
+    color: "#06B6D4",
+    bgColor: "bg-cyan-500",
+    hoverColor: "hover:bg-cyan-600",
+    active: true,
+    order: 4,
+  },
+]
+
 export default function MainCategoriesTab() {
   const { categories, loading, error, addMainCategory, updateMainCategory, deleteMainCategory } = useMainCategories()
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
@@ -184,6 +232,32 @@ export default function MainCategoriesTab() {
     }
   }
 
+  const handleReset = async () => {
+    if (confirm("⚠️ ATENÇÃO: Tem certeza que deseja redefinir as categorias principais?\n\nEsta ação irá:\n• Deletar todas as categorias atuais\n• Recriar as 4 categorias originais\n• Restaurar descrições e configurações padrão\n\nEsta ação NÃO pode ser desfeita!")) {
+      try {
+        console.log('🔄 MainCategoriesTab: Redefinindo categorias principais...')
+        
+        // Deletar todas as categorias existentes
+        for (const category of categories) {
+          await deleteMainCategory(category.id)
+        }
+        
+        // Aguardar um pouco para garantir que as deleções foram processadas
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        
+        // Recriar as categorias padrão
+        for (const category of defaultMainCategories) {
+          await addMainCategory(category)
+        }
+        
+        alert("✅ Categorias principais redefinidas com sucesso!\n\nAs 4 categorias originais foram restauradas:\n• BOTS\n• SITES\n• DESIGN\n• SERVIÇOS")
+      } catch (error) {
+        console.error('Erro ao redefinir categorias:', error)
+        alert("❌ Erro ao redefinir categorias. Tente novamente.")
+      }
+    }
+  }
+
   if (loading) return <div className="text-center py-8">Carregando categorias...</div>
   if (error) return <div className="text-center py-8 text-red-500">Erro: {error}</div>
 
@@ -196,26 +270,32 @@ export default function MainCategoriesTab() {
             Gerencie as categorias da página inicial
           </p>
         </div>
-        <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="w-4 h-4 mr-2" />
-              Adicionar Categoria
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-2xl">
-            <DialogHeader>
-              <DialogTitle>Adicionar Nova Categoria</DialogTitle>
-              <DialogDescription>
-                Crie uma nova categoria para a página inicial
-              </DialogDescription>
-            </DialogHeader>
-            <MainCategoryForm
-              onSubmit={handleAdd}
-              onCancel={() => setIsAddModalOpen(false)}
-            />
-          </DialogContent>
-        </Dialog>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={handleReset}>
+            <RefreshCw className="w-4 h-4 mr-2" />
+            Redefinir
+          </Button>
+          <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="w-4 h-4 mr-2" />
+                Adicionar Categoria
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle>Adicionar Nova Categoria</DialogTitle>
+                <DialogDescription>
+                  Crie uma nova categoria para a página inicial
+                </DialogDescription>
+              </DialogHeader>
+              <MainCategoryForm
+                onSubmit={handleAdd}
+                onCancel={() => setIsAddModalOpen(false)}
+              />
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       <div className="grid gap-4">
