@@ -24,11 +24,13 @@ import {
   Palette,
   Link as LinkIcon,
   CheckCircle,
-  Brain
+  Brain,
+  Phone
 } from "lucide-react"
 import { useOrders, useSiteConfig, useBotCategories, useSiteCategories, useBotTypes, useProjectTypes, useCustomizationOptions, usePricing, useServices, useMainCategories } from "@/hooks/useFirebaseData"
 import OrdersTab from "@/components/admin/orders-tab"
 import SiteConfigTab from "@/components/admin/site-config-tab"
+import ContactsTab from "@/components/admin/contacts-tab"
 import BotCategoriesTab from "@/components/admin/bot-categories-tab"
 import SiteCategoriesTab from "@/components/admin/site-categories-tab"
 import BotTypesTab from "@/components/admin/bot-types-tab"
@@ -178,10 +180,14 @@ export default function AdminPage() {
 
         {/* Tabs Principais */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-10">
+          <TabsList className="grid w-full grid-cols-11">
             <TabsTrigger value="orders" className="flex items-center gap-2">
               <Package className="w-4 h-4" />
               Pedidos
+            </TabsTrigger>
+            <TabsTrigger value="contacts" className="flex items-center gap-2">
+              <Phone className="w-4 h-4" />
+              Contatos
             </TabsTrigger>
             <TabsTrigger value="site-config" className="flex items-center gap-2">
               <Globe className="w-4 h-4" />
@@ -229,7 +235,41 @@ export default function AdminPage() {
             />
           </TabsContent>
 
-                      <TabsContent value="site-config" className="space-y-6">
+          <TabsContent value="contacts" className="space-y-6">
+            <ContactsTab 
+              siteConfig={siteConfig || {
+                id: '',
+                discordLink: 'https://discord.gg/jp2BzA4H',
+                phone: '',
+                email: '',
+                instagram: '',
+                whatsapp: 'https://wa.me/5511966485110',
+                companyName: 'CodeForge',
+                companyDescription: 'Transformando ideias em soluções digitais inovadoras.',
+                address: '',
+                city: '',
+                state: '',
+                country: 'Brasil',
+                maintenanceMode: false,
+                orderNotifications: true,
+                autoBackup: true,
+                siteTitle: 'CodeForge - Desenvolvimento de Bots e Sites',
+                siteDescription: 'Especialistas em desenvolvimento de bots para Discord e WhatsApp, sites e design.',
+                keywords: 'bots, discord, whatsapp, sites, desenvolvimento, design',
+                facebook: '',
+                twitter: '',
+                linkedin: '',
+                youtube: '',
+                businessHours: 'Segunda a Sexta, 9h às 18h',
+                timezone: 'America/Sao_Paulo',
+                currency: 'BRL',
+                updatedAt: null
+              }} 
+              onUpdate={updateConfig}
+            />
+          </TabsContent>
+
+          <TabsContent value="site-config" className="space-y-6">
               <SiteConfigTab 
                 siteConfig={siteConfig || {
                   id: '',
