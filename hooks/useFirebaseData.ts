@@ -10,7 +10,9 @@ import FirebaseDataService, {
   CustomizationOption, 
   Order, 
   Pricing,
-  MainCategory
+  MainCategory,
+  BotFeature,
+  BotConfig
 } from '@/lib/firebase-data-service'
 
 const firebaseService = FirebaseDataService.getInstance()
@@ -618,5 +620,89 @@ export function useMainCategories() {
     addMainCategory,
     updateMainCategory,
     deleteMainCategory,
+  }
+}
+
+export function useBotFeatures() {
+  const [features, setFeatures] = useState<BotFeature[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const unsubscribe = firebaseService.onBotFeaturesSnapshot((data) => {
+      setFeatures(data.filter(feature => feature.enabled))
+      setLoading(false)
+      setError(null)
+    })
+
+    return unsubscribe
+  }, [])
+
+  const addBotFeature = async (feature: Omit<BotFeature, 'id' | 'createdAt' | 'updatedAt'>) => {
+    try {
+      await firebaseService.addBotFeature(feature)
+    } catch (err) {
+      setError('Erro ao adicionar funcionalidade')
+      throw err
+    }
+  }
+
+  const updateBotFeature = async (id: string, feature: Partial<BotFeature>) => {
+    try {
+      await firebaseService.updateBotFeature(id, feature)
+    } catch (err) {
+      setError('Erro ao atualizar funcionalidade')
+      throw err
+    }
+  }
+
+  const deleteBotFeature = async (id: string) => {
+    try {
+      await firebaseService.deleteBotFeature(id)
+    } catch (err) {
+      setError('Erro ao deletar funcionalidade')
+      throw err
+    }
+  }
+
+  return {
+    features,
+    loading,
+    error,
+    addBotFeature,
+    updateBotFeature,
+    deleteBotFeature,
+  }
+}
+
+export function useBotConfig() {
+  const [config, setConfig] = useState<BotConfig | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const unsubscribe = firebaseService.onBotConfigSnapshot((data) => {
+      setConfig(data)
+      setLoading(false)
+      setError(null)
+    })
+
+    return unsubscribe
+  }, [])
+
+  const updateBotConfig = async (config: Partial<BotConfig>) => {
+    try {
+      await firebaseService.updateBotConfig(config)
+    } catch (err) {
+      setError('Erro ao atualizar configuração do bot')
+      throw err
+    }
+  }
+
+  return {
+    config,
+    loading,
+    error,
+    updateBotConfig,
   }
 }

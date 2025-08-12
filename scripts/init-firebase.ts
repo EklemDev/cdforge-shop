@@ -419,6 +419,83 @@ async function initializeFirebase() {
       await firebaseService.addMainCategory(category)
     }
 
+    // Bot Config
+    const defaultBotConfig = {
+      name: "Bot Personalizado",
+      description: "Bot inteligente com funcionalidades avançadas",
+      responseTime: "30 minutos",
+      contactMessage: "Entraremos em contato em {time}",
+      successMessage: "Solicitação enviada com sucesso! Entraremos em contato em {time}",
+      customizationOptions: {
+        enableQuickChat: true,
+        enableAutoResponses: true,
+        enableDetailedMode: false,
+        enableNotifications: true,
+        enableAnalytics: false,
+      },
+      active: true,
+    }
+
+    console.log("🤖 Inicializando configurações dos bots...")
+    await firebaseService.updateBotConfig(defaultBotConfig)
+
+    // Bot Features
+    const defaultBotFeatures = [
+      {
+        name: "Chat Rápido",
+        description: "Respostas automáticas para perguntas frequentes",
+        enabled: true,
+        order: 1,
+        category: "basic" as const,
+        icon: "MessageSquare",
+      },
+      {
+        name: "Atendimento Express",
+        description: "Modo de atendimento prioritário",
+        enabled: true,
+        order: 2,
+        category: "basic" as const,
+        icon: "Zap",
+      },
+      {
+        name: "Respostas Automáticas",
+        description: "Sistema de respostas pré-definidas",
+        enabled: true,
+        order: 3,
+        category: "advanced" as const,
+        icon: "Bot",
+      },
+      {
+        name: "Modo Detalhado",
+        description: "Respostas mais elaboradas e informativas",
+        enabled: false,
+        order: 4,
+        category: "advanced" as const,
+        icon: "FileText",
+      },
+      {
+        name: "Notificações",
+        description: "Sistema de notificações em tempo real",
+        enabled: true,
+        order: 5,
+        category: "premium" as const,
+        icon: "Bell",
+      },
+      {
+        name: "Analytics",
+        description: "Relatórios e análises de uso",
+        enabled: false,
+        order: 6,
+        category: "premium" as const,
+        icon: "BarChart3",
+      },
+    ]
+
+    console.log("⚙️ Inicializando funcionalidades dos bots...")
+    for (const feature of defaultBotFeatures) {
+      await firebaseService.addBotFeature(feature)
+    }
+
     console.log('✅ Firebase inicializado com sucesso!')
     console.log('📊 Dados criados:')
     console.log('   - Configuração do site')

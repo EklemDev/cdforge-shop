@@ -202,6 +202,38 @@ export interface MainCategory {
   updatedAt: Date
 }
 
+export interface BotFeature {
+  id: string
+  name: string
+  description: string
+  enabled: boolean
+  order: number
+  category: 'basic' | 'advanced' | 'premium'
+  icon: string
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface BotConfig {
+  id: string
+  name: string
+  description: string
+  responseTime: string
+  contactMessage: string
+  successMessage: string
+  features: BotFeature[]
+  customizationOptions: {
+    enableQuickChat: boolean
+    enableAutoResponses: boolean
+    enableDetailedMode: boolean
+    enableNotifications: boolean
+    enableAnalytics: boolean
+  }
+  active: boolean
+  createdAt: Date
+  updatedAt: Date
+}
+
 class FirebaseDataService {
   private static instance: FirebaseDataService
 
@@ -995,6 +1027,121 @@ class FirebaseDataService {
         updatedAt: doc.data().updatedAt?.toDate() || new Date(),
       })) as MainCategory[]
       callback(categories)
+    })
+  }
+
+  // Bot Features
+  async getBotFeatures(): Promise<BotFeature[]> {
+    try {
+      const querySnapshot = await getDocs(collection(db!, 'botFeatures'))
+      return querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        createdAt: doc.data().createdAt?.toDate() || new Date(),
+        updatedAt: doc.data().updatedAt?.toDate() || new Date(),
+      })) as BotFeature[]
+    } catch (error) {
+      console.error('Error getting bot features:', error)
+      return []
+    }
+  }
+
+  async addBotFeature(feature: Omit<BotFeature, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> {
+    try {
+      const docRef = await addDoc(collection(db!, 'botFeatures'), {
+        ...feature,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })
+      return docRef.id
+    } catch (error) {
+      console.error('Error adding bot feature:', error)
+      throw error
+    }
+  }
+
+  async updateBotFeature(id: string, feature: Partial<BotFeature>): Promise<void> {
+    try {
+      await updateDoc(doc(db!, 'botFeatures', id), {
+        ...feature,
+        updatedAt: new Date(),
+      })
+    } catch (error) {
+      console.error('Error updating bot feature:', error)
+      throw error
+    }
+  }
+
+  async deleteBotFeature(id: string): Promise<void> {
+    try {
+      await deleteDoc(doc(db!, 'botFeatures', id))
+    } catch (error) {
+      console.error('Error deleting bot feature:', error)
+      throw error
+    }
+  }
+
+  onBotFeaturesSnapshot(callback: (features: BotFeature[]) => void): () => void {
+    const q = query(collection(db!, 'botFeatures'), orderBy('order', 'asc'))
+    return onSnapshot(q, (querySnapshot) => {
+      const features = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        createdAt: doc.data().createdAt?.toDate() || new Date(),
+        updatedAt: doc.data().updatedAt?.toDate() || new Date(),
+      })) as BotFeature[]
+      callback(features)
+    })
+  }
+
+  // Bot Config
+  async getBotConfig(): Promise<BotConfig | null> {
+    try {
+      const docRef = doc(db!, 'botConfig', 'main')
+      const docSnap = await getDoc(docRef)
+      
+      if (docSnap.exists()) {
+        const data = docSnap.data()
+        return {
+          id: docSnap.id,
+          ...data,
+          createdAt: data.createdAt?.toDate() || new Date(),
+          updatedAt: data.updatedAt?.toDate() || new Date(),
+        } as BotConfig
+      }
+      return null
+    } catch (error) {
+      console.error('Error getting bot config:', error)
+      return null
+    }
+  }
+
+  async updateBotConfig(config: Partial<BotConfig>): Promise<void> {
+    try {
+      await setDoc(doc(db!, 'botConfig', 'main'), {
+        ...config,
+        updatedAt: new Date(),
+      }, { merge: true })
+    } catch (error) {
+      console.error('Error updating bot config:', error)
+      throw error
+    }
+  }
+
+  onBotConfigSnapshot(callback: (config: BotConfig | null) => void): () => void {
+    return onSnapshot(doc(db!, 'botConfig', 'main'), (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data()
+        const config = {
+          id: docSnap.id,
+          ...data,
+          createdAt: data.createdAt?.toDate() || new Date(),
+          updatedAt: data.updatedAt?.toDate() || new Date(),
+        } as BotConfig
+        callback(config)
+      } else {
+        callback(null)
+      }
     })
   }
 }
