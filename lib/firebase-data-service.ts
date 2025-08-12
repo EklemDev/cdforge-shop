@@ -187,6 +187,21 @@ export interface Plan {
   updatedAt: any
 }
 
+export interface MainCategory {
+  id: string
+  title: string
+  description: string
+  icon: string
+  href: string
+  color: string
+  bgColor: string
+  hoverColor: string
+  active: boolean
+  order: number
+  createdAt: Date
+  updatedAt: Date
+}
+
 class FirebaseDataService {
   private static instance: FirebaseDataService
 
@@ -916,6 +931,70 @@ class FirebaseDataService {
         ...doc.data()
       })) as Plan[]
       callback(plans)
+    })
+  }
+
+  // Main Categories
+  async getMainCategories(): Promise<MainCategory[]> {
+    try {
+      const querySnapshot = await getDocs(collection(db!, 'mainCategories'))
+      return querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        createdAt: doc.data().createdAt?.toDate() || new Date(),
+        updatedAt: doc.data().updatedAt?.toDate() || new Date(),
+      })) as MainCategory[]
+    } catch (error) {
+      console.error('Error getting main categories:', error)
+      return []
+    }
+  }
+
+  async addMainCategory(category: Omit<MainCategory, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> {
+    try {
+      const docRef = await addDoc(collection(db!, 'mainCategories'), {
+        ...category,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })
+      return docRef.id
+    } catch (error) {
+      console.error('Error adding main category:', error)
+      throw error
+    }
+  }
+
+  async updateMainCategory(id: string, category: Partial<MainCategory>): Promise<void> {
+    try {
+      await updateDoc(doc(db!, 'mainCategories', id), {
+        ...category,
+        updatedAt: new Date(),
+      })
+    } catch (error) {
+      console.error('Error updating main category:', error)
+      throw error
+    }
+  }
+
+  async deleteMainCategory(id: string): Promise<void> {
+    try {
+      await deleteDoc(doc(db!, 'mainCategories', id))
+    } catch (error) {
+      console.error('Error deleting main category:', error)
+      throw error
+    }
+  }
+
+  onMainCategoriesSnapshot(callback: (categories: MainCategory[]) => void): () => void {
+    const q = query(collection(db!, 'mainCategories'), orderBy('order', 'asc'))
+    return onSnapshot(q, (querySnapshot) => {
+      const categories = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        createdAt: doc.data().createdAt?.toDate() || new Date(),
+        updatedAt: doc.data().updatedAt?.toDate() || new Date(),
+      })) as MainCategory[]
+      callback(categories)
     })
   }
 }

@@ -26,7 +26,7 @@ import {
   CheckCircle,
   Brain
 } from "lucide-react"
-import { useOrders, useSiteConfig, useBotCategories, useSiteCategories, useBotTypes, useProjectTypes, useCustomizationOptions, usePricing, useServices } from "@/hooks/useFirebaseData"
+import { useOrders, useSiteConfig, useBotCategories, useSiteCategories, useBotTypes, useProjectTypes, useCustomizationOptions, usePricing, useServices, useMainCategories } from "@/hooks/useFirebaseData"
 import OrdersTab from "@/components/admin/orders-tab"
 import SiteConfigTab from "@/components/admin/site-config-tab"
 import BotCategoriesTab from "@/components/admin/bot-categories-tab"
@@ -35,6 +35,7 @@ import BotTypesTab from "@/components/admin/bot-types-tab"
 import ServicesTab from "@/components/admin/services-tab"
 import PricingTab from "@/components/admin/pricing-tab"
 import AutomationTab from "@/components/admin/automation-tab"
+import MainCategoriesTab from "@/components/admin/main-categories-tab"
 
 export default function AdminPage() {
   const router = useRouter()
@@ -50,6 +51,7 @@ export default function AdminPage() {
   const { options: customizationOptions, loading: customizationOptionsLoading, addOption, updateOption, deleteOption } = useCustomizationOptions()
   const { pricing, loading: pricingLoading, addPricing: addPricingItem, updatePricing: updatePricingItem, deletePricing: deletePricingItem } = usePricing()
   const { services, loading: servicesLoading, addService, updateService, deleteService } = useServices()
+  const { categories: mainCategories, loading: mainCategoriesLoading, addMainCategory, updateMainCategory, deleteMainCategory } = useMainCategories()
 
   useEffect(() => {
     // Verificar se o usuário tem acesso de desenvolvedor
@@ -175,7 +177,7 @@ export default function AdminPage() {
 
         {/* Tabs Principais */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-9">
+          <TabsList className="grid w-full grid-cols-10">
             <TabsTrigger value="orders" className="flex items-center gap-2">
               <Package className="w-4 h-4" />
               Pedidos
@@ -183,6 +185,10 @@ export default function AdminPage() {
             <TabsTrigger value="site-config" className="flex items-center gap-2">
               <Globe className="w-4 h-4" />
               Site
+            </TabsTrigger>
+            <TabsTrigger value="main-categories" className="flex items-center gap-2">
+              <LinkIcon className="w-4 h-4" />
+              Categorias Principais
             </TabsTrigger>
             <TabsTrigger value="services" className="flex items-center gap-2">
               <Settings className="w-4 h-4" />
@@ -192,7 +198,6 @@ export default function AdminPage() {
               <DollarSign className="w-4 h-4" />
               Preços
             </TabsTrigger>
-
             <TabsTrigger value="bot-categories" className="flex items-center gap-2">
               <Bot className="w-4 h-4" />
               Categorias Bots
@@ -255,6 +260,10 @@ export default function AdminPage() {
                 }} 
                 onUpdate={updateConfig}
               />
+            </TabsContent>
+
+            <TabsContent value="main-categories" className="space-y-6">
+              <MainCategoriesTab />
             </TabsContent>
 
             <TabsContent value="services" className="space-y-6">

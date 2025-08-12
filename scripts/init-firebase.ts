@@ -366,6 +366,59 @@ async function initializeFirebase() {
       await firebaseService.addPlan(plan)
     }
 
+    // Main Categories
+    const defaultMainCategories = [
+      {
+        title: "BOTS",
+        description: "Automação inteligente para Discord, WhatsApp, Instagram e Web Scraping",
+        icon: "Bot",
+        href: "/bots",
+        color: "#3B82F6",
+        bgColor: "bg-blue-500",
+        hoverColor: "hover:bg-blue-600",
+        active: true,
+        order: 1,
+      },
+      {
+        title: "SITES",
+        description: "Desenvolvimento web profissional, e-commerce, portfolios e landing pages",
+        icon: "Globe",
+        href: "/sites",
+        color: "#10B981",
+        bgColor: "bg-green-500",
+        hoverColor: "hover:bg-green-600",
+        active: true,
+        order: 2,
+      },
+      {
+        title: "DESIGN",
+        description: "Criação de identidade visual, logos, interfaces e materiais gráficos",
+        icon: "Palette",
+        href: "/design",
+        color: "#8B5CF6",
+        bgColor: "bg-purple-500",
+        hoverColor: "hover:bg-purple-600",
+        active: true,
+        order: 3,
+      },
+      {
+        title: "SERVIÇOS",
+        description: "Análise de Instagram, consultoria especializada e suporte técnico",
+        icon: "Settings",
+        href: "/servicos",
+        color: "#06B6D4",
+        bgColor: "bg-cyan-500",
+        hoverColor: "hover:bg-cyan-600",
+        active: true,
+        order: 4,
+      },
+    ] as const
+
+    console.log("🌐 Inicializando categorias principais...")
+    for (const category of defaultMainCategories) {
+      await firebaseService.addMainCategory(category)
+    }
+
     console.log('✅ Firebase inicializado com sucesso!')
     console.log('📊 Dados criados:')
     console.log('   - Configuração do site')

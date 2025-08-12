@@ -9,7 +9,8 @@ import FirebaseDataService, {
   ProjectType, 
   CustomizationOption, 
   Order, 
-  Pricing 
+  Pricing,
+  MainCategory
 } from '@/lib/firebase-data-service'
 
 const firebaseService = FirebaseDataService.getInstance()
@@ -566,4 +567,56 @@ export function usePlans() {
   }
 
   return { plans, loading, error, addPlan, updatePlan, deletePlan }
+}
+
+export function useMainCategories() {
+  const [categories, setCategories] = useState<MainCategory[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const unsubscribe = firebaseService.onMainCategoriesSnapshot((data) => {
+      setCategories(data.filter(cat => cat.active))
+      setLoading(false)
+      setError(null)
+    })
+
+    return unsubscribe
+  }, [])
+
+  const addMainCategory = async (category: Omit<MainCategory, 'id' | 'createdAt' | 'updatedAt'>) => {
+    try {
+      await firebaseService.addMainCategory(category)
+    } catch (err) {
+      setError('Erro ao adicionar categoria')
+      throw err
+    }
+  }
+
+  const updateMainCategory = async (id: string, category: Partial<MainCategory>) => {
+    try {
+      await firebaseService.updateMainCategory(id, category)
+    } catch (err) {
+      setError('Erro ao atualizar categoria')
+      throw err
+    }
+  }
+
+  const deleteMainCategory = async (id: string) => {
+    try {
+      await firebaseService.deleteMainCategory(id)
+    } catch (err) {
+      setError('Erro ao deletar categoria')
+      throw err
+    }
+  }
+
+  return {
+    categories,
+    loading,
+    error,
+    addMainCategory,
+    updateMainCategory,
+    deleteMainCategory,
+  }
 }
