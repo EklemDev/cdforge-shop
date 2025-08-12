@@ -35,8 +35,18 @@ export default function SiteCategoriesTab({
   const [editingCategory, setEditingCategory] = useState<SiteCategory | null>(null)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
 
-  const handleAdd = (formData: Omit<SiteCategory, 'id'>) => {
-    onAdd(formData)
+  const handleAdd = (formData: Partial<SiteCategory>) => {
+    // Garantir que todos os campos obrigatórios estejam presentes
+    const completeData: Omit<SiteCategory, 'id'> = {
+      name: formData.name || '',
+      description: formData.description || '',
+      icon: formData.icon || '',
+      active: formData.active ?? true,
+      order: formData.order ?? 0,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    }
+    onAdd(completeData)
     setIsAddModalOpen(false)
   }
 

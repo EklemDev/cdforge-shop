@@ -36,8 +36,18 @@ export default function BotCategoriesTab({
   const [editingCategory, setEditingCategory] = useState<BotCategory | null>(null)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
 
-  const handleAdd = (formData: Omit<BotCategory, 'id'>) => {
-    onAdd(formData)
+  const handleAdd = (formData: Partial<BotCategory>) => {
+    // Garantir que todos os campos obrigatórios estejam presentes
+    const completeData: Omit<BotCategory, 'id'> = {
+      name: formData.name || '',
+      description: formData.description || '',
+      icon: formData.icon || '',
+      active: formData.active ?? true,
+      order: formData.order ?? 0,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    }
+    onAdd(completeData)
     setIsAddModalOpen(false)
   }
 

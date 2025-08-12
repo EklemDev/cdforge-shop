@@ -37,8 +37,19 @@ export default function BotTypesTab({
   const [editingBotType, setEditingBotType] = useState<BotType | null>(null)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
 
-  const handleAdd = (formData: Omit<BotType, 'id'>) => {
-    onAdd(formData)
+  const handleAdd = (formData: Partial<BotType>) => {
+    // Garantir que todos os campos obrigatórios estejam presentes
+    const completeData: Omit<BotType, 'id'> = {
+      name: formData.name || '',
+      description: formData.description || '',
+      features: formData.features || [],
+      categoryId: formData.categoryId || '',
+      active: formData.active ?? true,
+      order: formData.order ?? 0,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    }
+    onAdd(completeData)
     setIsAddModalOpen(false)
   }
 
