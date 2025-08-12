@@ -26,7 +26,7 @@ import {
   CheckCircle,
   Brain
 } from "lucide-react"
-import { useOrders, useSiteConfig, useBotCategories, useSiteCategories, useBotTypes, useProjectTypes, useCustomizationOptions, usePricing, useServices, useMainCategories, useBotFeatures, useBotConfig } from "@/hooks/useFirebaseData"
+import { useOrders, useSiteConfig, useBotCategories, useSiteCategories, useBotTypes, useProjectTypes, useCustomizationOptions, usePricing, useServices, useMainCategories } from "@/hooks/useFirebaseData"
 import OrdersTab from "@/components/admin/orders-tab"
 import SiteConfigTab from "@/components/admin/site-config-tab"
 import BotCategoriesTab from "@/components/admin/bot-categories-tab"
@@ -36,7 +36,7 @@ import ServicesTab from "@/components/admin/services-tab"
 import PricingTab from "@/components/admin/pricing-tab"
 import AutomationTab from "@/components/admin/automation-tab"
 import MainCategoriesTab from "@/components/admin/main-categories-tab"
-import BotConfigTab from "@/components/admin/bot-config-tab"
+
 
 export default function AdminPage() {
   const router = useRouter()
@@ -53,8 +53,6 @@ export default function AdminPage() {
   const { pricing, loading: pricingLoading, addPricing: addPricingItem, updatePricing: updatePricingItem, deletePricing: deletePricingItem } = usePricing()
   const { services, loading: servicesLoading, addService, updateService, deleteService } = useServices()
   const { categories: mainCategories, loading: mainCategoriesLoading, addMainCategory, updateMainCategory, deleteMainCategory } = useMainCategories()
-  const { features: botFeatures, loading: botFeaturesLoading, addBotFeature, updateBotFeature, deleteBotFeature } = useBotFeatures()
-  const { config: botConfig, loading: botConfigLoading, updateBotConfig } = useBotConfig()
 
   useEffect(() => {
     // Verificar se o usuário tem acesso de desenvolvedor
@@ -180,7 +178,7 @@ export default function AdminPage() {
 
         {/* Tabs Principais */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-11">
+          <TabsList className="grid w-full grid-cols-10">
             <TabsTrigger value="orders" className="flex items-center gap-2">
               <Package className="w-4 h-4" />
               Pedidos
@@ -192,10 +190,6 @@ export default function AdminPage() {
             <TabsTrigger value="main-categories" className="flex items-center gap-2">
               <LinkIcon className="w-4 h-4" />
               Categorias Principais
-            </TabsTrigger>
-            <TabsTrigger value="bot-config" className="flex items-center gap-2">
-              <Bot className="w-4 h-4" />
-              Config Bots
             </TabsTrigger>
             <TabsTrigger value="services" className="flex items-center gap-2">
               <Settings className="w-4 h-4" />
@@ -271,10 +265,6 @@ export default function AdminPage() {
 
             <TabsContent value="main-categories" className="space-y-6">
               <MainCategoriesTab />
-            </TabsContent>
-
-            <TabsContent value="bot-config" className="space-y-6">
-              <BotConfigTab />
             </TabsContent>
 
             <TabsContent value="services" className="space-y-6">
