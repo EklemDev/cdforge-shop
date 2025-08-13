@@ -45,6 +45,7 @@ export default function AdminPage() {
   const [devKey, setDevKey] = useState("")
   const [isAuthorized, setIsAuthorized] = useState(false)
   const [activeTab, setActiveTab] = useState("orders")
+  const [tabKey, setTabKey] = useState(0) // Força re-renderização
   const { orders, loading: ordersLoading, updateOrder, deleteOrder } = useOrders()
   const { config: siteConfig, loading: configLoading, updateConfig } = useSiteConfig()
   const { categories: botCategories, loading: botCategoriesLoading, addCategory: addBotCategory, updateCategory: updateBotCategory, deleteCategory: deleteBotCategory } = useBotCategories()
@@ -73,6 +74,15 @@ export default function AdminPage() {
     setIsAuthorized(true)
   }, [router])
 
+  // Força re-renderização quando a aba muda
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setTabKey(prev => prev + 1)
+    }, 100)
+    
+    return () => clearTimeout(timer)
+  }, [activeTab])
+
   const handleLogout = () => {
     try {
       localStorage.removeItem("devKey")
@@ -84,6 +94,11 @@ export default function AdminPage() {
       // Fallback: redirecionar diretamente
       window.location.href = "/"
     }
+  }
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(value)
+    setTabKey(prev => prev + 1) // Força re-renderização
   }
 
   if (!isAuthorized) {
@@ -191,7 +206,7 @@ export default function AdminPage() {
 
 
         {/* Tabs Principais */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6" key={tabKey}>
           <TabsList className="grid w-full grid-cols-4 gap-2">
             {/* Primeira Linha - 4 abas principais */}
             <TabsTrigger value="orders" className="flex items-center gap-2">
@@ -237,45 +252,49 @@ export default function AdminPage() {
           </TabsList>
 
           <TabsContent value="orders" className="space-y-6" forceMount>
-            <OrdersTab 
-              orders={orders} 
-              onOrderUpdate={updateOrder} 
-              onOrderDelete={deleteOrder} 
-            />
+            {activeTab === "orders" && (
+              <OrdersTab 
+                orders={orders} 
+                onOrderUpdate={updateOrder} 
+                onOrderDelete={deleteOrder} 
+              />
+            )}
           </TabsContent>
 
           <TabsContent value="contacts" className="space-y-6" forceMount>
-            <ContactsTab 
-              siteConfig={siteConfig || {
-                id: '',
-                discordLink: 'https://discord.gg/jp2BzA4H',
-                phone: '',
-                email: '',
-                instagram: '',
-                whatsapp: 'https://wa.me/5511966485110',
-                companyName: 'CodeForge',
-                companyDescription: 'Transformando ideias em soluções digitais inovadoras.',
-                address: '',
-                city: '',
-                state: '',
-                country: 'Brasil',
-                maintenanceMode: false,
-                orderNotifications: true,
-                autoBackup: true,
-                siteTitle: 'CodeForge - Desenvolvimento de Bots e Sites',
-                siteDescription: 'Especialistas em desenvolvimento de bots para Discord e WhatsApp, sites e design.',
-                keywords: 'bots, discord, whatsapp, sites, desenvolvimento, design',
-                facebook: '',
-                twitter: '',
-                linkedin: '',
-                youtube: '',
-                businessHours: 'Segunda a Sexta, 9h às 18h',
-                timezone: 'America/Sao_Paulo',
-                currency: 'BRL',
-                updatedAt: null
-              }} 
-              onUpdate={updateConfig}
-            />
+            {activeTab === "contacts" && (
+              <ContactsTab 
+                siteConfig={siteConfig || {
+                  id: '',
+                  discordLink: 'https://discord.gg/jp2BzA4H',
+                  phone: '',
+                  email: '',
+                  instagram: '',
+                  whatsapp: 'https://wa.me/5511966485110',
+                  companyName: 'CodeForge',
+                  companyDescription: 'Transformando ideias em soluções digitais inovadoras.',
+                  address: '',
+                  city: '',
+                  state: '',
+                  country: 'Brasil',
+                  maintenanceMode: false,
+                  orderNotifications: true,
+                  autoBackup: true,
+                  siteTitle: 'CodeForge - Desenvolvimento de Bots e Sites',
+                  siteDescription: 'Especialistas em desenvolvimento de bots para Discord e WhatsApp, sites e design.',
+                  keywords: 'bots, discord, whatsapp, sites, desenvolvimento, design',
+                  facebook: '',
+                  twitter: '',
+                  linkedin: '',
+                  youtube: '',
+                  businessHours: 'Segunda a Sexta, 9h às 18h',
+                  timezone: 'America/Sao_Paulo',
+                  currency: 'BRL',
+                  updatedAt: null
+                }} 
+                onUpdate={updateConfig}
+              />
+            )}
           </TabsContent>
 
 
@@ -317,84 +336,96 @@ export default function AdminPage() {
             </TabsContent>
 
             <TabsContent value="main-categories" className="space-y-6" forceMount>
-              <MainCategoriesTab />
+              {activeTab === "main-categories" && <MainCategoriesTab />}
             </TabsContent>
 
             <TabsContent value="services" className="space-y-6" forceMount>
-              <ServicesTab 
-                services={services}
-                onAdd={addService}
-                onUpdate={updateService}
-                onDelete={deleteService}
-              />
+              {activeTab === "services" && (
+                <ServicesTab 
+                  services={services}
+                  onAdd={addService}
+                  onUpdate={updateService}
+                  onDelete={deleteService}
+                />
+              )}
             </TabsContent>
 
             <TabsContent value="pricing" className="space-y-6" forceMount>
-              <PricingTab 
-                pricing={pricing}
-                onAdd={addPricingItem}
-                onUpdate={updatePricingItem}
-                onDelete={deletePricingItem}
-              />
+              {activeTab === "pricing" && (
+                <PricingTab 
+                  pricing={pricing}
+                  onAdd={addPricingItem}
+                  onUpdate={updatePricingItem}
+                  onDelete={deletePricingItem}
+                />
+              )}
             </TabsContent>
 
 
 
           <TabsContent value="bot-categories" className="space-y-6" forceMount>
-            <BotCategoriesTab 
-              categories={botCategories}
-              onAdd={(category) => {
-                const newCategory = {
-                  ...category,
-                  order: botCategories.length + 1
-                }
-                addBotCategory(newCategory)
-              }}
-              onUpdate={updateBotCategory}
-              onDelete={deleteBotCategory}
-            />
+            {activeTab === "bot-categories" && (
+              <BotCategoriesTab 
+                categories={botCategories}
+                onAdd={(category) => {
+                  const newCategory = {
+                    ...category,
+                    order: botCategories.length + 1
+                  }
+                  addBotCategory(newCategory)
+                }}
+                onUpdate={updateBotCategory}
+                onDelete={deleteBotCategory}
+              />
+            )}
           </TabsContent>
 
           <TabsContent value="site-categories" className="space-y-6" forceMount>
-            <SiteCategoriesTab 
-              categories={siteCategories}
-              onAdd={(category) => {
-                const newCategory = {
-                  ...category,
-                  order: siteCategories.length + 1
-                }
-                addSiteCategory(newCategory)
-              }}
-              onUpdate={updateSiteCategory}
-              onDelete={deleteSiteCategory}
-            />
+            {activeTab === "site-categories" && (
+              <SiteCategoriesTab 
+                categories={siteCategories}
+                onAdd={(category) => {
+                  const newCategory = {
+                    ...category,
+                    order: siteCategories.length + 1
+                  }
+                  addSiteCategory(newCategory)
+                }}
+                onUpdate={updateSiteCategory}
+                onDelete={deleteSiteCategory}
+              />
+            )}
           </TabsContent>
 
 
 
           <TabsContent value="customization" className="space-y-6" forceMount>
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Palette className="w-5 h-5 text-purple-500" />
-                  Opções de Personalização
-                </CardTitle>
-                <CardDescription>
-                  Gerencie as opções de personalização disponíveis para os clientes
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-600">
-                  Funcionalidade em desenvolvimento...
-                </p>
-              </CardContent>
-            </Card>
+            {activeTab === "customization" && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Palette className="w-5 h-5 text-purple-500" />
+                    Opções de Personalização
+                  </CardTitle>
+                  <CardDescription>
+                    Gerencie as opções de personalização disponíveis para os clientes
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-gray-600">
+                    Funcionalidade em desenvolvimento...
+                  </p>
+                </CardContent>
+              </Card>
+            )}
           </TabsContent>
 
 
 
                       <TabsContent value="dev-keys" className="space-y-6" forceMount>
-              <DevKeysTab keys={devKeys} onAdd={addDevKey} onUpdate={updateDevKey} onDelete={deleteDevKey} />
+              {activeTab === "dev-keys" && (
+                <DevKeysTab keys={devKeys} onAdd={addDevKey} onUpdate={updateDevKey} onDelete={deleteDevKey} />
+              )}
             </TabsContent>
         </Tabs>
       </main>
