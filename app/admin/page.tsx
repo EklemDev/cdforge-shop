@@ -131,7 +131,7 @@ export default function AdminPage() {
             <Button
               variant="outline"
               onClick={handleLogout}
-              className="text-red-600 border-red-200 hover:bg-red-50"
+              className="text-red-600 border-red-200 hover:bg-red-50 cursor-pointer"
             >
               <LogOut className="w-4 h-4 mr-2" />
               Sair
@@ -253,7 +253,7 @@ export default function AdminPage() {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="orders" className="space-y-6">
+          <TabsContent value="orders" className="space-y-6" forceMount>
             <OrdersTab 
               orders={orders} 
               onOrderUpdate={updateOrder} 
@@ -261,7 +261,7 @@ export default function AdminPage() {
             />
           </TabsContent>
 
-          <TabsContent value="contacts" className="space-y-6">
+          <TabsContent value="contacts" className="space-y-6" forceMount>
             <ContactsTab 
               siteConfig={siteConfig || {
                 id: '',
@@ -295,21 +295,21 @@ export default function AdminPage() {
             />
           </TabsContent>
 
-          <TabsContent value="plans" className="space-y-6">
+          <TabsContent value="plans" className="space-y-6" forceMount>
             <PlansTab 
               plans={plans}
               onUpdate={setPlans}
             />
           </TabsContent>
 
-          <TabsContent value="platforms" className="space-y-6">
+          <TabsContent value="platforms" className="space-y-6" forceMount>
             <PlatformsTab 
               platforms={platforms}
               onUpdate={setPlatforms}
             />
           </TabsContent>
 
-          <TabsContent value="site-config" className="space-y-6">
+          <TabsContent value="site-config" className="space-y-6" forceMount>
               <SiteConfigTab 
                 siteConfig={siteConfig || {
                   id: '',
@@ -343,11 +343,11 @@ export default function AdminPage() {
               />
             </TabsContent>
 
-            <TabsContent value="main-categories" className="space-y-6">
+            <TabsContent value="main-categories" className="space-y-6" forceMount>
               <MainCategoriesTab />
             </TabsContent>
 
-            <TabsContent value="services" className="space-y-6">
+            <TabsContent value="services" className="space-y-6" forceMount>
               <ServicesTab 
                 services={services}
                 onAdd={addService}
@@ -356,7 +356,7 @@ export default function AdminPage() {
               />
             </TabsContent>
 
-            <TabsContent value="pricing" className="space-y-6">
+            <TabsContent value="pricing" className="space-y-6" forceMount>
               <PricingTab 
                 pricing={pricing}
                 onAdd={addPricingItem}
@@ -367,7 +367,7 @@ export default function AdminPage() {
 
 
 
-          <TabsContent value="bot-categories" className="space-y-6">
+          <TabsContent value="bot-categories" className="space-y-6" forceMount>
             <BotCategoriesTab 
               categories={botCategories}
               onAdd={(category) => {
@@ -382,7 +382,7 @@ export default function AdminPage() {
             />
           </TabsContent>
 
-          <TabsContent value="site-categories" className="space-y-6">
+          <TabsContent value="site-categories" className="space-y-6" forceMount>
             <SiteCategoriesTab 
               categories={siteCategories}
               onAdd={(category) => {
@@ -397,7 +397,7 @@ export default function AdminPage() {
             />
           </TabsContent>
 
-          <TabsContent value="bot-types" className="space-y-6">
+          <TabsContent value="bot-types" className="space-y-6" forceMount>
             <BotTypesTab 
               botTypes={botTypes}
               onAdd={(botType) => {
@@ -413,7 +413,7 @@ export default function AdminPage() {
             />
           </TabsContent>
 
-          <TabsContent value="customization" className="space-y-6">
+          <TabsContent value="customization" className="space-y-6" forceMount>
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -432,11 +432,11 @@ export default function AdminPage() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="automation" className="space-y-6">
+          <TabsContent value="automation" className="space-y-6" forceMount>
             <AutomationTab orders={orders} />
           </TabsContent>
 
-                      <TabsContent value="dev-keys" className="space-y-6">
+                      <TabsContent value="dev-keys" className="space-y-6" forceMount>
               <DevKeysTab keys={devKeys} onAdd={addDevKey} onUpdate={updateDevKey} onDelete={deleteDevKey} />
             </TabsContent>
         </Tabs>
