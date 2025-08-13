@@ -1,6 +1,5 @@
 import { initializeApp, getApps } from 'firebase/app'
 import { getFirestore } from 'firebase/firestore'
-import { getAuth } from 'firebase/auth'
 import { getAnalytics } from 'firebase/analytics'
 
 const firebaseConfig = {
@@ -25,10 +24,15 @@ if (firebaseConfig.apiKey && !getApps().length) {
 // Initialize Firestore
 export const db = app ? getFirestore(app) : null
 
-// Initialize Auth
-export const auth = app ? getAuth(app) : null
-
-// Initialize Analytics (only in browser)
-export const analytics = typeof window !== 'undefined' && app ? getAnalytics(app) : null
+// Initialize Analytics (only in browser and if not already initialized)
+let analytics = null
+if (typeof window !== 'undefined' && app) {
+  try {
+    analytics = getAnalytics(app)
+  } catch (error) {
+    console.warn('Analytics initialization failed:', error)
+  }
+}
+export { analytics }
 
 export default app
