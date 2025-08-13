@@ -256,6 +256,7 @@ function ServiceForm({
     e.preventDefault()
     onSubmit({
       ...formData,
+      order: services.length + 1,
       features: formData.features.filter(f => f.trim() !== ""),
       benefits: formData.benefits.filter(b => b.trim() !== ""),
       process: formData.process.filter(p => p.trim() !== ""),

@@ -313,7 +313,7 @@ export default function ContactsTab({
           <div className="bg-gray-50 p-6 rounded-lg space-y-4">
             {contactFields.length > 0 ? (
               contactFields.map(field => {
-                const IconComponent = getIconComponent(field.icon)
+                const IconComponent = getIconComponent(field.icon || 'MessageSquare')
                 return (
                   <div key={field.id} className="flex items-center gap-3">
                     <IconComponent className="w-5 h-5 text-blue-500" />
