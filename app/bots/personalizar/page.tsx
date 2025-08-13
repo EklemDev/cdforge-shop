@@ -176,7 +176,7 @@ export default function PersonalizarBotPage() {
                   variant="outline"
                   size="sm"
                   onClick={() => window.history.back()}
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 transition-colors"
                 >
                   <ArrowLeft className="w-4 h-4" />
                   Voltar
@@ -540,7 +540,7 @@ export default function PersonalizarBotPage() {
                     variant="outline"
                     onClick={handlePrev}
                     disabled={currentStep === 1}
-                    className="flex items-center gap-2 bg-transparent"
+                    className="flex items-center gap-2 bg-transparent cursor-pointer hover:bg-gray-50 transition-colors"
                   >
                     <ArrowLeft className="w-4 h-4" />
                     Anterior
@@ -634,8 +634,9 @@ export default function PersonalizarBotPage() {
               <Button
                 onClick={() => window.location.href = '/'}
                 variant="outline"
-                className="w-full"
+                className="w-full cursor-pointer hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
               >
+                <ArrowLeft className="w-4 h-4" />
                 Voltar ao Início
               </Button>
             </div>

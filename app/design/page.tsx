@@ -18,7 +18,7 @@ export default function DesignPage() {
                 variant="outline"
                 size="sm"
                 onClick={() => window.history.back()}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Voltar

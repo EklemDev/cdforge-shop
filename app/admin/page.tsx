@@ -38,6 +38,7 @@ import ServicesTab from "@/components/admin/services-tab"
 import PricingTab from "@/components/admin/pricing-tab"
 import MainCategoriesTab from "@/components/admin/main-categories-tab"
 import DevKeysTab from "@/components/admin/dev-keys-tab"
+import LoadingSpinner from "@/components/loading-spinner"
 
 
 export default function AdminPage() {
@@ -301,39 +302,7 @@ export default function AdminPage() {
 
 
 
-          <TabsContent value="site-config" className="space-y-6" forceMount>
-              <SiteConfigTab 
-                siteConfig={siteConfig || {
-                  id: '',
-                  discordLink: 'https://discord.gg/jp2BzA4H',
-                  phone: '',
-                  email: '',
-                  instagram: '',
-                  whatsapp: 'https://wa.me/5511966485110',
-                  companyName: 'CodeForge',
-                  companyDescription: 'Transformando ideias em soluções digitais inovadoras.',
-                  address: '',
-                  city: '',
-                  state: '',
-                  country: 'Brasil',
-                  maintenanceMode: false,
-                  orderNotifications: true,
-                  autoBackup: true,
-                  siteTitle: 'CodeForge - Desenvolvimento de Bots e Sites',
-                  siteDescription: 'Especialistas em desenvolvimento de bots para Discord e WhatsApp, sites e design.',
-                  keywords: 'bots, discord, whatsapp, sites, desenvolvimento, design',
-                  facebook: '',
-                  twitter: '',
-                  linkedin: '',
-                  youtube: '',
-                  businessHours: 'Segunda a Sexta, 9h às 18h',
-                  timezone: 'America/Sao_Paulo',
-                  currency: 'BRL',
-                  updatedAt: null
-                }} 
-                onUpdate={updateConfig}
-              />
-            </TabsContent>
+
 
             <TabsContent value="main-categories" className="space-y-6" forceMount>
               {activeTab === "main-categories" && <MainCategoriesTab />}
