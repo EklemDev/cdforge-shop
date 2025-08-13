@@ -27,18 +27,15 @@ import {
   Brain,
   Phone
 } from "lucide-react"
-import { useOrders, useSiteConfig, useBotCategories, useSiteCategories, useBotTypes, useProjectTypes, useCustomizationOptions, usePricing, useServices, useMainCategories, useDevKeys } from "@/hooks/useFirebaseData"
+import { useOrders, useSiteConfig, useBotCategories, useSiteCategories, useProjectTypes, useCustomizationOptions, usePricing, useServices, useMainCategories, useDevKeys } from "@/hooks/useFirebaseData"
 import OrdersTab from "@/components/admin/orders-tab"
 import SiteConfigTab from "@/components/admin/site-config-tab"
 import ContactsTab from "@/components/admin/contacts-tab"
 import PlansTab from "@/components/admin/plans-tab"
-import PlatformsTab from "@/components/admin/platforms-tab"
 import BotCategoriesTab from "@/components/admin/bot-categories-tab"
 import SiteCategoriesTab from "@/components/admin/site-categories-tab"
-import BotTypesTab from "@/components/admin/bot-types-tab"
 import ServicesTab from "@/components/admin/services-tab"
 import PricingTab from "@/components/admin/pricing-tab"
-import AutomationTab from "@/components/admin/automation-tab"
 import MainCategoriesTab from "@/components/admin/main-categories-tab"
 import DevKeysTab from "@/components/admin/dev-keys-tab"
 
@@ -52,7 +49,7 @@ export default function AdminPage() {
   const { config: siteConfig, loading: configLoading, updateConfig } = useSiteConfig()
   const { categories: botCategories, loading: botCategoriesLoading, addCategory: addBotCategory, updateCategory: updateBotCategory, deleteCategory: deleteBotCategory } = useBotCategories()
   const { categories: siteCategories, loading: siteCategoriesLoading, addCategory: addSiteCategory, updateCategory: updateSiteCategory, deleteCategory: deleteSiteCategory } = useSiteCategories()
-  const { types: botTypes, loading: botTypesLoading, addType: addBotType, updateType: updateBotType, deleteType: deleteBotType } = useBotTypes()
+
   const { types: projectTypes, loading: projectTypesLoading, addType: addProjectType, updateType: updateProjectType, deleteType: deleteProjectType } = useProjectTypes()
   const { options: customizationOptions, loading: customizationOptionsLoading, addOption, updateOption, deleteOption } = useCustomizationOptions()
   const { pricing, loading: pricingLoading, addPricing: addPricingItem, updatePricing: updatePricingItem, deletePricing: deletePricingItem } = usePricing()
@@ -60,9 +57,8 @@ export default function AdminPage() {
   const { categories: mainCategories, loading: mainCategoriesLoading, addMainCategory, updateMainCategory, deleteMainCategory } = useMainCategories()
   const { keys: devKeys, loading: devKeysLoading, addDevKey, updateDevKey, deleteDevKey } = useDevKeys()
   
-  // Estados para planos e plataformas
+  // Estados para planos
   const [plans, setPlans] = useState<any[]>([])
-  const [platforms, setPlatforms] = useState<any[]>([])
 
   useEffect(() => {
     // Verificar se o usuário tem acesso de desenvolvedor
@@ -197,8 +193,8 @@ export default function AdminPage() {
 
         {/* Tabs Principais */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6 gap-2">
-            {/* Primeira Linha - 6 abas principais */}
+          <TabsList className="grid w-full grid-cols-5 gap-2">
+            {/* Primeira Linha - 5 abas principais */}
             <TabsTrigger value="orders" className="flex items-center gap-2">
               <Package className="w-4 h-4" />
               Pedidos
@@ -211,10 +207,7 @@ export default function AdminPage() {
               <Package className="w-4 h-4" />
               Planos
             </TabsTrigger>
-            <TabsTrigger value="platforms" className="flex items-center gap-2">
-              <Globe className="w-4 h-4" />
-              Plataformas
-            </TabsTrigger>
+
             <TabsTrigger value="services" className="flex items-center gap-2">
               <Settings className="w-4 h-4" />
               Nossos Serviços
@@ -225,8 +218,8 @@ export default function AdminPage() {
             </TabsTrigger>
           </TabsList>
           
-          {/* Segunda Linha - 6 abas secundárias */}
-          <TabsList className="grid w-full grid-cols-6 gap-2">
+          {/* Segunda Linha - 4 abas secundárias */}
+          <TabsList className="grid w-full grid-cols-4 gap-2">
             <TabsTrigger value="main-categories" className="flex items-center gap-2">
               <LinkIcon className="w-4 h-4" />
               Categorias
@@ -239,18 +232,12 @@ export default function AdminPage() {
               <Globe className="w-4 h-4" />
               Nossos Sites
             </TabsTrigger>
-            <TabsTrigger value="bot-types" className="flex items-center gap-2">
-              <Bot className="w-4 h-4" />
-              Tipos de Bots
-            </TabsTrigger>
+
             <TabsTrigger value="dev-keys" className="flex items-center gap-2">
               <Shield className="w-4 h-4" />
               Chaves de Dev
             </TabsTrigger>
-            <TabsTrigger value="automation" className="flex items-center gap-2">
-              <Brain className="w-4 h-4" />
-              Automação
-            </TabsTrigger>
+
           </TabsList>
 
           <TabsContent value="orders" className="space-y-6" forceMount>
@@ -302,12 +289,7 @@ export default function AdminPage() {
             />
           </TabsContent>
 
-          <TabsContent value="platforms" className="space-y-6" forceMount>
-            <PlatformsTab 
-              platforms={platforms}
-              onUpdate={setPlatforms}
-            />
-          </TabsContent>
+
 
           <TabsContent value="site-config" className="space-y-6" forceMount>
               <SiteConfigTab 
@@ -397,21 +379,7 @@ export default function AdminPage() {
             />
           </TabsContent>
 
-          <TabsContent value="bot-types" className="space-y-6" forceMount>
-            <BotTypesTab 
-              botTypes={botTypes}
-              onAdd={(botType) => {
-                const newBotType = {
-                  ...botType,
-                  order: botTypes.length + 1,
-                  categoryId: ''
-                }
-                addBotType(newBotType)
-              }}
-              onUpdate={updateBotType}
-              onDelete={deleteBotType}
-            />
-          </TabsContent>
+
 
           <TabsContent value="customization" className="space-y-6" forceMount>
             <Card>
@@ -432,9 +400,7 @@ export default function AdminPage() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="automation" className="space-y-6" forceMount>
-            <AutomationTab orders={orders} />
-          </TabsContent>
+
 
                       <TabsContent value="dev-keys" className="space-y-6" forceMount>
               <DevKeysTab keys={devKeys} onAdd={addDevKey} onUpdate={updateDevKey} onDelete={deleteDevKey} />
