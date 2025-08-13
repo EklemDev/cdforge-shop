@@ -40,6 +40,7 @@ import ServicesTab from "@/components/admin/services-tab"
 import PricingTab from "@/components/admin/pricing-tab"
 import AutomationTab from "@/components/admin/automation-tab"
 import MainCategoriesTab from "@/components/admin/main-categories-tab"
+import TestOrder from "@/components/test-order"
 
 
 export default function AdminPage() {
@@ -182,6 +183,11 @@ export default function AdminPage() {
               </div>
             </CardContent>
           </Card>
+        </div>
+
+        {/* Componente de Teste */}
+        <div className="mb-8">
+          <TestOrder />
         </div>
 
         {/* Tabs Principais */}
