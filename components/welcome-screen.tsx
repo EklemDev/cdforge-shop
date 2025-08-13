@@ -1,9 +1,11 @@
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
-import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { Code, Cpu, Terminal, MessageCircle, Users, Handshake } from "lucide-react"
 
 export default function WelcomeScreen() {
+  const router = useRouter()
+  
   return (
     <section className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-cyan-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center overflow-hidden transition-colors">
       {/* Geometric Background Elements */}
@@ -89,11 +91,11 @@ export default function WelcomeScreen() {
           {/* Botões de Ação */}
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16">
             <Button
-              asChild
               size="lg"
-              className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-12 py-6 text-xl rounded-2xl transition-all duration-300 hover:scale-105 hover:shadow-2xl shadow-lg font-semibold"
+              onClick={() => router.push('/categorias')}
+              className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-12 py-6 text-xl rounded-2xl transition-all duration-300 hover:scale-105 hover:shadow-2xl shadow-lg font-semibold cursor-pointer"
             >
-              <Link href="/categorias">✨ Escolher Solução</Link>
+              ✨ Escolher Solução
             </Button>
 
             <Button
