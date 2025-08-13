@@ -210,21 +210,21 @@ export default function AdminPage() {
         <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6" key={tabKey}>
           <TabsList className="grid w-full grid-cols-4 gap-2">
             {/* Primeira Linha - 4 abas principais */}
-            <TabsTrigger value="orders" className="flex items-center gap-2">
+            <TabsTrigger value="orders" className="flex items-center gap-2 cursor-pointer">
               <Package className="w-4 h-4" />
               Pedidos
             </TabsTrigger>
-            <TabsTrigger value="contacts" className="flex items-center gap-2">
+            <TabsTrigger value="contacts" className="flex items-center gap-2 cursor-pointer">
               <Phone className="w-4 h-4" />
               Contatos
             </TabsTrigger>
 
 
-            <TabsTrigger value="services" className="flex items-center gap-2">
+            <TabsTrigger value="services" className="flex items-center gap-2 cursor-pointer">
               <Settings className="w-4 h-4" />
               Nossos Serviços
             </TabsTrigger>
-            <TabsTrigger value="pricing" className="flex items-center gap-2">
+            <TabsTrigger value="pricing" className="flex items-center gap-2 cursor-pointer">
               <DollarSign className="w-4 h-4" />
               Preços
             </TabsTrigger>
@@ -232,20 +232,20 @@ export default function AdminPage() {
           
           {/* Segunda Linha - 4 abas secundárias */}
           <TabsList className="grid w-full grid-cols-4 gap-2">
-            <TabsTrigger value="main-categories" className="flex items-center gap-2">
+            <TabsTrigger value="main-categories" className="flex items-center gap-2 cursor-pointer">
               <LinkIcon className="w-4 h-4" />
               Categorias
             </TabsTrigger>
-            <TabsTrigger value="bot-categories" className="flex items-center gap-2">
+            <TabsTrigger value="bot-categories" className="flex items-center gap-2 cursor-pointer">
               <Bot className="w-4 h-4" />
               Nossos Bots
             </TabsTrigger>
-            <TabsTrigger value="site-categories" className="flex items-center gap-2">
+            <TabsTrigger value="site-categories" className="flex items-center gap-2 cursor-pointer">
               <Globe className="w-4 h-4" />
               Nossos Sites
             </TabsTrigger>
 
-            <TabsTrigger value="dev-keys" className="flex items-center gap-2">
+            <TabsTrigger value="dev-keys" className="flex items-center gap-2 cursor-pointer">
               <Shield className="w-4 h-4" />
               Chaves de Dev
             </TabsTrigger>
