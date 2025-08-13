@@ -56,6 +56,7 @@ export interface SiteConfig {
   currency: string
   
   updatedAt: any
+  lastUpdated: any
 }
 
 export interface BotCategory {
@@ -308,7 +309,8 @@ class FirebaseDataService {
         timezone: 'America/Sao_Paulo',
         currency: 'BRL',
         
-        updatedAt: serverTimestamp()
+        updatedAt: serverTimestamp(),
+        lastUpdated: serverTimestamp()
       }
       
       await this.updateSiteConfig(defaultConfig)
@@ -325,7 +327,8 @@ class FirebaseDataService {
       const docRef = doc(db!, 'siteConfig', 'main')
       await setDoc(docRef, {
         ...config,
-        updatedAt: serverTimestamp()
+        updatedAt: serverTimestamp(),
+        lastUpdated: serverTimestamp()
       }, { merge: true })
       console.log('✅ SiteConfig atualizado com sucesso')
       return true
