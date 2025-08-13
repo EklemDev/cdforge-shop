@@ -8,17 +8,22 @@ export default function UpdateIndicator() {
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    setMounted(true)
-    // Pegar a data e hora atual
-    const now = new Date()
-    const formattedTime = now.toLocaleString('pt-BR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    })
-    setUpdateTime(formattedTime)
+    // Aguardar um pouco para garantir que o DOM está pronto
+    const timer = setTimeout(() => {
+      setMounted(true)
+      // Pegar a data e hora atual
+      const now = new Date()
+      const formattedTime = now.toLocaleString('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      })
+      setUpdateTime(formattedTime)
+    }, 100)
+
+    return () => clearTimeout(timer)
   }, [])
 
   // Não renderizar até que o componente esteja montado

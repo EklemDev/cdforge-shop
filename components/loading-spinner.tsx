@@ -13,18 +13,23 @@ export default function LoadingSpinner({
   show = true 
 }: LoadingSpinnerProps) {
   const [dots, setDots] = useState("")
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    if (!show) return
+    setMounted(true)
+  }, [])
+
+  useEffect(() => {
+    if (!show || !mounted) return
 
     const interval = setInterval(() => {
       setDots(prev => prev.length >= 3 ? "" : prev + ".")
     }, 500)
 
     return () => clearInterval(interval)
-  }, [show])
+  }, [show, mounted])
 
-  if (!show) return null
+  if (!show || !mounted) return null
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
