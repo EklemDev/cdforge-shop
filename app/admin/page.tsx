@@ -31,7 +31,7 @@ import { useOrders, useSiteConfig, useBotCategories, useSiteCategories, useProje
 import OrdersTab from "@/components/admin/orders-tab"
 import SiteConfigTab from "@/components/admin/site-config-tab"
 import ContactsTab from "@/components/admin/contacts-tab"
-import PlansTab from "@/components/admin/plans-tab"
+
 import BotCategoriesTab from "@/components/admin/bot-categories-tab"
 import SiteCategoriesTab from "@/components/admin/site-categories-tab"
 import ServicesTab from "@/components/admin/services-tab"
@@ -57,8 +57,7 @@ export default function AdminPage() {
   const { categories: mainCategories, loading: mainCategoriesLoading, addMainCategory, updateMainCategory, deleteMainCategory } = useMainCategories()
   const { keys: devKeys, loading: devKeysLoading, addDevKey, updateDevKey, deleteDevKey } = useDevKeys()
   
-  // Estados para planos
-  const [plans, setPlans] = useState<any[]>([])
+
 
   useEffect(() => {
     // Verificar se o usuário tem acesso de desenvolvedor
@@ -193,8 +192,8 @@ export default function AdminPage() {
 
         {/* Tabs Principais */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5 gap-2">
-            {/* Primeira Linha - 5 abas principais */}
+          <TabsList className="grid w-full grid-cols-4 gap-2">
+            {/* Primeira Linha - 4 abas principais */}
             <TabsTrigger value="orders" className="flex items-center gap-2">
               <Package className="w-4 h-4" />
               Pedidos
@@ -203,10 +202,7 @@ export default function AdminPage() {
               <Phone className="w-4 h-4" />
               Contatos
             </TabsTrigger>
-            <TabsTrigger value="plans" className="flex items-center gap-2">
-              <Package className="w-4 h-4" />
-              Planos
-            </TabsTrigger>
+
 
             <TabsTrigger value="services" className="flex items-center gap-2">
               <Settings className="w-4 h-4" />
@@ -282,12 +278,7 @@ export default function AdminPage() {
             />
           </TabsContent>
 
-          <TabsContent value="plans" className="space-y-6" forceMount>
-            <PlansTab 
-              plans={plans}
-              onUpdate={setPlans}
-            />
-          </TabsContent>
+
 
 
 
