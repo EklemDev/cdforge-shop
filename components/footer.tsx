@@ -66,11 +66,7 @@ export default function Footer() {
                   Design
                 </Link>
               </li>
-              <li>
-                <Link href="/personalizar" className="text-gray-400 hover:text-blue-400 transition-colors">
-                  Personalizar
-                </Link>
-              </li>
+
               <li>
                 <Link href="/contato" className="text-gray-400 hover:text-blue-400 transition-colors">
                   Contato

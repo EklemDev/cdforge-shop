@@ -3,7 +3,6 @@
 import Header from "@/components/header"
 import Footer from "@/components/footer"
 import FreeRecommendations from "@/components/free-recommendations"
-import CallToAction from "@/components/call-to-action"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
 
@@ -26,7 +25,6 @@ export default function PlanosPage() {
           </div>
         </div>
         <FreeRecommendations />
-        <CallToAction />
       </main>
       <Footer />
     </div>
