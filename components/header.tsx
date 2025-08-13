@@ -2,10 +2,12 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Menu, X } from "lucide-react"
 
 export default function Header() {
+  const router = useRouter()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
 
@@ -42,38 +44,36 @@ export default function Header() {
 
             {/* Centered Desktop Navigation */}
             <nav className="hidden md:flex items-center space-x-8">
-              <Link
-                href="/planos"
-                className="text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 transition-colors font-medium"
+              <button
+                onClick={() => router.push('/planos')}
+                className="text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 transition-colors font-medium cursor-pointer"
               >
                 Planos
-              </Link>
-              <Link
-                href="/categorias"
-                className="text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 transition-colors font-medium"
+              </button>
+              <button
+                onClick={() => router.push('/categorias')}
+                className="text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 transition-colors font-medium cursor-pointer"
               >
                 Categorias
-              </Link>
+              </button>
             </nav>
 
             {/* Right side buttons */}
             <div className="hidden md:flex items-center space-x-3 w-32 justify-end">
               <Button
-                asChild
                 variant="outline"
                 size="sm"
-                className="border-red-300 text-red-600 hover:bg-red-50 dark:border-red-600 dark:text-red-400 dark:hover:bg-red-900/20 transition-all duration-300 bg-transparent"
+                onClick={() => router.push('/ajuda')}
+                className="border-red-300 text-red-600 hover:bg-red-50 dark:border-red-600 dark:text-red-400 dark:hover:bg-red-900/20 transition-all duration-300 bg-transparent cursor-pointer"
               >
-                <Link href="/ajuda">Ajuda</Link>
+                Ajuda
               </Button>
 
               <Button
-                asChild
-                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-all duration-300 hover:scale-105"
+                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-all duration-300 hover:scale-105 cursor-pointer"
+                onClick={() => window.open('https://discord.gg/jp2BzA4H', '_blank')}
               >
-                <a href="https://discord.gg/jp2BzA4H" target="_blank" rel="noopener noreferrer">
-                  Discord
-                </a>
+                Discord
               </Button>
             </div>
 
@@ -92,12 +92,15 @@ export default function Header() {
         {isMenuOpen && (
           <div className="md:hidden py-4 border-t border-gray-100 dark:border-gray-800">
             <nav className="flex flex-col space-y-4 items-center">
-              <Link
-                href="/planos"
-                className="text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 transition-colors font-medium"
+              <button
+                onClick={() => {
+                  router.push('/planos')
+                  setIsMenuOpen(false)
+                }}
+                className="text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 transition-colors font-medium cursor-pointer"
               >
                 Planos
-              </Link>
+              </button>
               <Link
                 href="/categorias"
                 className="text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 transition-colors font-medium"

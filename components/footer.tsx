@@ -2,6 +2,7 @@
 
 import Image from "next/image"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Cpu, Code, Terminal, Handshake, Users, Shield } from "lucide-react"
 import { useState } from "react"
@@ -9,6 +10,7 @@ import DevKeyModal from "./dev-key-modal"
 import { useSiteConfig } from "@/hooks/useFirebaseData"
 
 export default function Footer() {
+  const router = useRouter()
   const [isDevModalOpen, setIsDevModalOpen] = useState(false)
   const { config, loading, error } = useSiteConfig()
   
@@ -47,30 +49,45 @@ export default function Footer() {
             <h3 className="text-lg font-semibold mb-4">Links Rápidos</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/" className="text-gray-400 hover:text-blue-400 transition-colors">
+                <button
+                  onClick={() => router.push('/')}
+                  className="text-gray-400 hover:text-blue-400 transition-colors cursor-pointer"
+                >
                   Home
-                </Link>
+                </button>
               </li>
               <li>
-                <Link href="/bots" className="text-gray-400 hover:text-blue-400 transition-colors">
+                <button
+                  onClick={() => router.push('/bots')}
+                  className="text-gray-400 hover:text-blue-400 transition-colors cursor-pointer"
+                >
                   Bots
-                </Link>
+                </button>
               </li>
               <li>
-                <Link href="/sites" className="text-gray-400 hover:text-blue-400 transition-colors">
+                <button
+                  onClick={() => router.push('/sites')}
+                  className="text-gray-400 hover:text-blue-400 transition-colors cursor-pointer"
+                >
                   Sites
-                </Link>
+                </button>
               </li>
               <li>
-                <Link href="/design" className="text-gray-400 hover:text-blue-400 transition-colors">
+                <button
+                  onClick={() => router.push('/design')}
+                  className="text-gray-400 hover:text-blue-400 transition-colors cursor-pointer"
+                >
                   Design
-                </Link>
+                </button>
               </li>
 
               <li>
-                <Link href="/contato" className="text-gray-400 hover:text-blue-400 transition-colors">
+                <button
+                  onClick={() => router.push('/contato')}
+                  className="text-gray-400 hover:text-blue-400 transition-colors cursor-pointer"
+                >
                   Contato
-                </Link>
+                </button>
               </li>
             </ul>
           </div>
