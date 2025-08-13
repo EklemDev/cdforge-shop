@@ -11,7 +11,8 @@ import {
   query, 
   orderBy,
   serverTimestamp,
-  where
+  where,
+  increment
 } from 'firebase/firestore'
 import { db } from './firebase'
 
@@ -230,6 +231,18 @@ export interface BotConfig {
     enableAnalytics: boolean
   }
   active: boolean
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface DevKey {
+  id: string
+  key: string
+  name: string
+  description: string
+  active: boolean
+  lastUsed?: Date
+  usageCount: number
   createdAt: Date
   updatedAt: Date
 }
@@ -1142,6 +1155,90 @@ class FirebaseDataService {
       } else {
         callback(null)
       }
+    })
+  }
+
+  // ===== DEV KEYS =====
+  async getDevKeys(): Promise<DevKey[]> {
+    try {
+      const q = query(collection(db!, 'devKeys'), orderBy('createdAt', 'desc'))
+      const querySnapshot = await getDocs(q)
+      
+      return querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        createdAt: doc.data().createdAt?.toDate() || new Date(),
+        updatedAt: doc.data().updatedAt?.toDate() || new Date(),
+        lastUsed: doc.data().lastUsed?.toDate(),
+      })) as DevKey[]
+    } catch (error) {
+      console.error('Erro ao buscar chaves de dev:', error)
+      return []
+    }
+  }
+
+  async addDevKey(key: Omit<DevKey, 'id' | 'createdAt' | 'updatedAt'>): Promise<string | null> {
+    try {
+      const docRef = await addDoc(collection(db!, 'devKeys'), {
+        ...key,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      })
+      return docRef.id
+    } catch (error) {
+      console.error('Erro ao adicionar chave de dev:', error)
+      return null
+    }
+  }
+
+  async updateDevKey(id: string, key: Partial<DevKey>): Promise<boolean> {
+    try {
+      const docRef = doc(db!, 'devKeys', id)
+      await updateDoc(docRef, {
+        ...key,
+        updatedAt: serverTimestamp()
+      })
+      return true
+    } catch (error) {
+      console.error('Erro ao atualizar chave de dev:', error)
+      return false
+    }
+  }
+
+  async deleteDevKey(id: string): Promise<boolean> {
+    try {
+      await deleteDoc(doc(db!, 'devKeys', id))
+      return true
+    } catch (error) {
+      console.error('Erro ao deletar chave de dev:', error)
+      return false
+    }
+  }
+
+  async logDevKeyUsage(keyId: string): Promise<void> {
+    try {
+      const docRef = doc(db!, 'devKeys', keyId)
+      await updateDoc(docRef, {
+        lastUsed: serverTimestamp(),
+        usageCount: increment(1),
+        updatedAt: serverTimestamp()
+      })
+    } catch (error) {
+      console.error('Erro ao registrar uso da chave:', error)
+    }
+  }
+
+  onDevKeysSnapshot(callback: (keys: DevKey[]) => void): () => void {
+    const q = query(collection(db!, 'devKeys'), orderBy('createdAt', 'desc'))
+    return onSnapshot(q, (querySnapshot) => {
+      const keys = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        createdAt: doc.data().createdAt?.toDate() || new Date(),
+        updatedAt: doc.data().updatedAt?.toDate() || new Date(),
+        lastUsed: doc.data().lastUsed?.toDate(),
+      })) as DevKey[]
+      callback(keys)
     })
   }
 }

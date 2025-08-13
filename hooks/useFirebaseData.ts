@@ -12,7 +12,10 @@ import FirebaseDataService, {
   Pricing,
   MainCategory,
   BotFeature,
-  BotConfig
+  BotConfig,
+  DevKey,
+  Service,
+  Plan
 } from '@/lib/firebase-data-service'
 
 const firebaseService = FirebaseDataService.getInstance()
@@ -704,5 +707,78 @@ export function useBotConfig() {
     loading,
     error,
     updateBotConfig,
+  }
+}
+
+export function useDevKeys() {
+  const [keys, setKeys] = useState<DevKey[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const unsubscribe = firebaseService.onDevKeysSnapshot((data) => {
+      setKeys(data)
+      setLoading(false)
+      setError(null)
+    })
+
+    return unsubscribe
+  }, [])
+
+  const addDevKey = async (key: Omit<DevKey, 'id' | 'createdAt' | 'updatedAt'>) => {
+    try {
+      setError(null)
+      const id = await firebaseService.addDevKey(key)
+      return id
+    } catch (err) {
+      setError('Erro ao adicionar chave de dev')
+      return null
+    }
+  }
+
+  const updateDevKey = async (id: string, key: Partial<DevKey>) => {
+    try {
+      setError(null)
+      const success = await firebaseService.updateDevKey(id, key)
+      if (!success) {
+        setError('Erro ao atualizar chave de dev')
+      }
+      return success
+    } catch (err) {
+      setError('Erro ao atualizar chave de dev')
+      return false
+    }
+  }
+
+  const deleteDevKey = async (id: string) => {
+    try {
+      setError(null)
+      const success = await firebaseService.deleteDevKey(id)
+      if (!success) {
+        setError('Erro ao deletar chave de dev')
+      }
+      return success
+    } catch (err) {
+      setError('Erro ao deletar chave de dev')
+      return false
+    }
+  }
+
+  const logDevKeyUsage = async (keyId: string) => {
+    try {
+      await firebaseService.logDevKeyUsage(keyId)
+    } catch (err) {
+      console.error('Erro ao registrar uso da chave:', err)
+    }
+  }
+
+  return {
+    keys,
+    loading,
+    error,
+    addDevKey,
+    updateDevKey,
+    deleteDevKey,
+    logDevKeyUsage,
   }
 }

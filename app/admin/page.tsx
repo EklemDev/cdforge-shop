@@ -27,7 +27,7 @@ import {
   Brain,
   Phone
 } from "lucide-react"
-import { useOrders, useSiteConfig, useBotCategories, useSiteCategories, useBotTypes, useProjectTypes, useCustomizationOptions, usePricing, useServices, useMainCategories } from "@/hooks/useFirebaseData"
+import { useOrders, useSiteConfig, useBotCategories, useSiteCategories, useBotTypes, useProjectTypes, useCustomizationOptions, usePricing, useServices, useMainCategories, useDevKeys } from "@/hooks/useFirebaseData"
 import OrdersTab from "@/components/admin/orders-tab"
 import SiteConfigTab from "@/components/admin/site-config-tab"
 import ContactsTab from "@/components/admin/contacts-tab"
@@ -40,7 +40,7 @@ import ServicesTab from "@/components/admin/services-tab"
 import PricingTab from "@/components/admin/pricing-tab"
 import AutomationTab from "@/components/admin/automation-tab"
 import MainCategoriesTab from "@/components/admin/main-categories-tab"
-
+import DevKeysTab from "@/components/admin/dev-keys-tab"
 
 
 export default function AdminPage() {
@@ -58,6 +58,7 @@ export default function AdminPage() {
   const { pricing, loading: pricingLoading, addPricing: addPricingItem, updatePricing: updatePricingItem, deletePricing: deletePricingItem } = usePricing()
   const { services, loading: servicesLoading, addService, updateService, deleteService } = useServices()
   const { categories: mainCategories, loading: mainCategoriesLoading, addMainCategory, updateMainCategory, deleteMainCategory } = useMainCategories()
+  const { keys: devKeys, loading: devKeysLoading, addDevKey, updateDevKey, deleteDevKey } = useDevKeys()
   
   // Estados para planos e plataformas
   const [plans, setPlans] = useState<any[]>([])
@@ -216,7 +217,7 @@ export default function AdminPage() {
             </TabsTrigger>
             <TabsTrigger value="services" className="flex items-center gap-2">
               <Settings className="w-4 h-4" />
-              Serviços
+              Nossos Serviços
             </TabsTrigger>
             <TabsTrigger value="pricing" className="flex items-center gap-2">
               <DollarSign className="w-4 h-4" />
@@ -232,19 +233,19 @@ export default function AdminPage() {
             </TabsTrigger>
             <TabsTrigger value="bot-categories" className="flex items-center gap-2">
               <Bot className="w-4 h-4" />
-              Categorias Bots
+              Nossos Bots
             </TabsTrigger>
             <TabsTrigger value="site-categories" className="flex items-center gap-2">
               <Globe className="w-4 h-4" />
-              Categorias Sites
+              Nossos Sites
             </TabsTrigger>
             <TabsTrigger value="bot-types" className="flex items-center gap-2">
               <Bot className="w-4 h-4" />
               Tipos de Bots
             </TabsTrigger>
-            <TabsTrigger value="customization" className="flex items-center gap-2">
-              <Palette className="w-4 h-4" />
-              Personalização
+            <TabsTrigger value="dev-keys" className="flex items-center gap-2">
+              <Shield className="w-4 h-4" />
+              Chaves de Dev
             </TabsTrigger>
             <TabsTrigger value="automation" className="flex items-center gap-2">
               <Brain className="w-4 h-4" />
@@ -434,6 +435,10 @@ export default function AdminPage() {
           <TabsContent value="automation" className="space-y-6">
             <AutomationTab orders={orders} />
           </TabsContent>
+
+                      <TabsContent value="dev-keys" className="space-y-6">
+              <DevKeysTab keys={devKeys} onAdd={addDevKey} onUpdate={updateDevKey} onDelete={deleteDevKey} />
+            </TabsContent>
         </Tabs>
       </main>
     </div>

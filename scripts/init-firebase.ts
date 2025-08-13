@@ -2,6 +2,24 @@ import FirebaseDataService from '../lib/firebase-data-service'
 
 const firebaseService = FirebaseDataService.getInstance()
 
+// Dados padrão para chaves de desenvolvedor
+const defaultDevKeys = [
+  {
+    key: 'MLLK-1227-ZANE-SCO2',
+    name: 'Chave Principal',
+    description: 'Chave principal para acesso administrativo',
+    active: true,
+    usageCount: 0
+  },
+  {
+    key: 'PEDR-O202-4DEV-KEY',
+    name: 'Chave Pedro',
+    description: 'Chave de acesso para Pedro',
+    active: true,
+    usageCount: 0
+  }
+]
+
 async function initializeFirebase() {
   console.log('🚀 Inicializando Firebase com dados padrão...')
 
@@ -496,6 +514,12 @@ async function initializeFirebase() {
       await firebaseService.addBotFeature(feature)
     }
 
+    // Adicionar chaves de desenvolvedor
+    console.log('🔑 Adicionando chaves de desenvolvedor...')
+    for (const key of defaultDevKeys) {
+      await firebaseService.addDevKey(key)
+    }
+
     console.log('✅ Firebase inicializado com sucesso!')
     console.log('📊 Dados criados:')
     console.log('   - Configuração do site')
@@ -507,6 +531,7 @@ async function initializeFirebase() {
     console.log('   - 4 planos de preços')
     console.log('   - 3 serviços')
     console.log('   - 3 planos')
+    console.log('   - 2 chaves de desenvolvedor')
 
   } catch (error) {
     console.error('❌ Erro ao inicializar Firebase:', error)
