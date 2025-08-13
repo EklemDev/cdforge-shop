@@ -4,31 +4,25 @@ import { useEffect } from 'react'
 
 export default function FaviconLoader() {
   useEffect(() => {
-    // Força o Firefox a carregar o favicon
-    const link = document.createElement('link')
-    link.rel = 'icon'
-    link.href = '/logo.png'
-    link.type = 'image/png'
-    
-    // Remove favicons existentes
-    const existingFavicons = document.querySelectorAll('link[rel*="icon"]')
-    existingFavicons.forEach(favicon => favicon.remove())
-    
-    // Adiciona o novo favicon
-    document.head.appendChild(link)
-    
-    // Adiciona também como shortcut icon
-    const shortcutLink = document.createElement('link')
-    shortcutLink.rel = 'shortcut icon'
-    shortcutLink.href = '/logo.png'
-    shortcutLink.type = 'image/png'
-    document.head.appendChild(shortcutLink)
-    
-    // Adiciona apple-touch-icon
-    const appleLink = document.createElement('link')
-    appleLink.rel = 'apple-touch-icon'
-    appleLink.href = '/logo.png'
-    document.head.appendChild(appleLink)
+    // Aguardar um pouco para garantir que o DOM está pronto
+    const timer = setTimeout(() => {
+      try {
+        // Verificar se já existe um favicon
+        const existingFavicon = document.querySelector('link[rel="icon"]')
+        if (!existingFavicon) {
+          // Adiciona apenas se não existir
+          const link = document.createElement('link')
+          link.rel = 'icon'
+          link.href = '/logo.png'
+          link.type = 'image/png'
+          document.head.appendChild(link)
+        }
+      } catch (error) {
+        console.warn('Erro ao carregar favicon:', error)
+      }
+    }, 100)
+
+    return () => clearTimeout(timer)
   }, [])
 
   return null
