@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
 import { ArrowRight, ArrowLeft, Clock, Check, Eye } from "lucide-react"
-import { useBotRequests } from "@/hooks/useFirebase"
+import { useOrders } from "@/hooks/useFirebaseData"
 import { toast } from "@/hooks/use-toast"
 import BotDemo from "@/components/bot-demo"
 
@@ -56,7 +56,7 @@ export default function PersonalizarBotPage() {
   const searchParams = useSearchParams()
   const [currentStep, setCurrentStep] = useState(1)
   const [showDemo, setShowDemo] = useState(false)
-  const { createBotRequest, loading: firebaseLoading } = useBotRequests()
+  const { addOrder, loading: firebaseLoading } = useOrders()
   const [formData, setFormData] = useState({
     types: [] as string[], // Mudando para array para permitir múltipla seleção
     platform: "",
@@ -126,29 +126,30 @@ export default function PersonalizarBotPage() {
 
   const handleSubmit = async () => {
     try {
-      // Salvar no Firebase
-      const botRequestData = {
-        name: formData.name,
-        phone: formData.phone,
-        discord: formData.discord,
-        instagram: formData.instagram,
+      // Salvar no Firebase usando o sistema novo
+      const orderData = {
+        customerName: formData.name,
+        customerEmail: formData.instagram || formData.discord || '', // Usando Instagram/Discord como email
+        customerPhone: formData.phone || formData.discord || formData.instagram || '',
         projectType: 'bot' as const,
-        projectDetails: {
-          types: formData.types,
-          platform: formData.platform,
-          description: formData.description,
-          features: formData.features,
-          budget: formData.budget,
-          deadline: formData.deadline
-        },
+        category: formData.types.join(', ') || 'Bot Personalizado',
+        description: `Plataforma: ${formData.platform}\nTipos: ${formData.types.join(', ')}\nFuncionalidades: ${formData.features.join(', ')}\n\n${formData.description}`,
+        budget: formData.budget || 'Não informado',
+        timeline: formData.deadline || 'Não informado',
         status: 'pending' as const,
-        priority: 'medium' as const
+        assignedTo: '',
+        priority: 'medium' as const,
+        notes: `Detalhes do bot:\n- Tipos: ${formData.types.join(', ')}\n- Plataforma: ${formData.platform}\n- Funcionalidades: ${formData.features.join(', ')}`
       }
 
-      const clientId = await createBotRequest(botRequestData)
+      const orderId = await addOrder(orderData)
       
-      // Mostrar modal de sucesso
-      setShowSuccessModal(true)
+      if (orderId) {
+        // Mostrar modal de sucesso
+        setShowSuccessModal(true)
+      } else {
+        throw new Error('Falha ao criar pedido')
+      }
     } catch (error) {
       console.error('Erro ao salvar solicitação:', error)
       toast({

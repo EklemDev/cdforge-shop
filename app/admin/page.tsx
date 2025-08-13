@@ -40,7 +40,7 @@ import ServicesTab from "@/components/admin/services-tab"
 import PricingTab from "@/components/admin/pricing-tab"
 import AutomationTab from "@/components/admin/automation-tab"
 import MainCategoriesTab from "@/components/admin/main-categories-tab"
-import TestOrder from "@/components/test-order"
+
 
 
 export default function AdminPage() {
@@ -78,9 +78,16 @@ export default function AdminPage() {
   }, [router])
 
   const handleLogout = () => {
-    localStorage.removeItem("devKey")
-    localStorage.removeItem("devAccess")
-    router.push("/")
+    try {
+      localStorage.removeItem("devKey")
+      localStorage.removeItem("devAccess")
+      // Forçar redirecionamento
+      window.location.href = "/"
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error)
+      // Fallback: redirecionar diretamente
+      window.location.href = "/"
+    }
   }
 
   if (!isAuthorized) {
@@ -185,10 +192,7 @@ export default function AdminPage() {
           </Card>
         </div>
 
-        {/* Componente de Teste */}
-        <div className="mb-8">
-          <TestOrder />
-        </div>
+
 
         {/* Tabs Principais */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
