@@ -56,7 +56,7 @@ export class DeepSeekService {
         throw new Error('Cliente DeepSeek não disponível no browser')
       }
 
-      // Teste simples primeiro
+  
       const testResponse = await client.chat.completions.create({
         model: 'deepseek-chat',
         messages: [
@@ -115,7 +115,7 @@ export class DeepSeekService {
   }
 
   /**
-   * Analisa pedidos automaticamente
+   *Analisa pedidos automaticamente
    */
   async analyzeOrder(orderData: any): Promise<AutomationResponse> {
     const prompt = `

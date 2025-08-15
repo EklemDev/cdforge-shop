@@ -19,7 +19,7 @@ export default function DevKeyModal({ isOpen, onClose }: DevKeyModalProps) {
   const [error, setError] = useState("")
   const [success, setSuccess] = useState(false)
 
-  const validDevKeys = ["Mllk1227", "Zanesco2024", "PedroDev"] // Chaves válidas
+  const validDevKeys = ["Melke"] // Chave válida
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -40,8 +40,8 @@ export default function DevKeyModal({ isOpen, onClose }: DevKeyModalProps) {
         onClose()
         setDevKey("")
         setSuccess(false)
-        // Redirecionar para área administrativa ou mostrar interface de admin
-        window.location.href = "/admin"
+        // Redirecionar para a pasta DEV CDFORGER
+        window.location.href = "/dev-cdforger"
       }, 1500)
     } else {
       setError("Chave de desenvolvedor inválida. Tente novamente.")
@@ -82,9 +82,7 @@ export default function DevKeyModal({ isOpen, onClose }: DevKeyModalProps) {
               className="font-mono"
               required
             />
-            <p className="text-xs text-gray-500">
-              Exemplo: Mllk1227
-            </p>
+
           </div>
 
           {error && (
@@ -97,7 +95,7 @@ export default function DevKeyModal({ isOpen, onClose }: DevKeyModalProps) {
           {success && (
             <Alert className="border-green-200 bg-green-50 text-green-800">
               <CheckCircle className="h-4 w-4" />
-              <AlertDescription>Chave válida! Redirecionando para área administrativa...</AlertDescription>
+              <AlertDescription>Chave válida! Redirecionando para área de desenvolvimento...</AlertDescription>
             </Alert>
           )}
 

@@ -6,21 +6,21 @@ import Link from "next/link"
 const services = [
   {
     icon: Bot,
-    title: "BOTS",
-    description: "Plataforma de criação de bots para Discord, WhatsApp, Instagram e automação web.",
-    href: "#bots",
+    title: "",
+    description: "",
+    href: "",
   },
   {
     icon: Globe,
-    title: "SITES",
-    description: "Desenvolvimento de sites profissionais, e-commerce, portfolios e landing pages.",
-    href: "#sites",
+    title: "",
+    description: "",
+    href: "",
   },
   {
     icon: Settings,
-    title: "SERVIÇOS",
-    description: "Serviços especializados em análise, consultoria e suporte técnico personalizado.",
-    href: "#services",
+    title: "",
+    description: "",
+    href: "",
   },
 ]
 

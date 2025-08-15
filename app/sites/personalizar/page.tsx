@@ -36,7 +36,7 @@ const siteTypes = [
 const commonFeatures = [
   "Design responsivo (mobile-first)",
   "Otimização SEO",
-  "Painel administrativo",
+  "Sistema de gestão",
   "Formulário de contato",
   "Integração com redes sociais",
   "Analytics e relatórios",

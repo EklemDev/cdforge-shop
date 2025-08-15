@@ -189,6 +189,30 @@ export interface Plan {
   updatedAt: any
 }
 
+export interface Founder {
+  id: string
+  name: string
+  role: string
+  location: string
+  availability: {
+    start: string
+    end: string
+    timezone: string
+  }
+  specialties: string[]
+  icon: string
+  color: string
+  bgGradient: string
+  isOnline: boolean
+  discordId?: string
+  email?: string
+  phone?: string
+  active: boolean
+  order: number
+  createdAt: any
+  updatedAt: any
+}
+
 export interface MainCategory {
   id: string
   title: string
@@ -248,6 +272,48 @@ export interface DevKey {
   updatedAt: Date
 }
 
+export interface Plan {
+  id: string
+  name: string
+  contacts: {
+    melke: string
+    zanesco: string
+    pedro: string
+  }
+  testDays: number
+  price: number
+  promotion: {
+    active: boolean
+    type: 'percentage' | 'fixed'
+    value: number
+    description: string
+  }
+  active: boolean
+  order: number
+  createdAt: any
+  updatedAt: any
+}
+
+export interface PlanOrder {
+  id: string
+  planId: string
+  planName: string
+  planPrice: number
+  testDays: number
+  promotion?: {
+    active: boolean
+    type: 'percentage' | 'fixed'
+    value: number
+    description: string
+  }
+  customerName?: string
+  customerEmail?: string
+  customerPhone?: string
+  status: 'pending' | 'confirmed' | 'cancelled'
+  createdAt: Date
+  updatedAt: Date
+}
+
 class FirebaseDataService {
   private static instance: FirebaseDataService
 
@@ -274,29 +340,29 @@ class FirebaseDataService {
       const defaultConfig: SiteConfig = {
         id: 'main',
         // Informações de Contato
-        discordLink: 'https://discord.gg/jp2BzA4H',
-        phone: '(11) 99999-9999',
-        email: 'contato@codeforge.dev',
-        instagram: '@codeforge.dev',
-        whatsapp: 'https://wa.me/5511966485110',
+        discordLink: '',
+        phone: '',
+        email: '',
+        instagram: '',
+        whatsapp: '',
         
         // Informações da Empresa
-        companyName: 'CodeForge',
-        companyDescription: 'Transformando ideias em soluções digitais inovadoras.',
+        companyName: '',
+        companyDescription: '',
         address: '',
         city: '',
         state: '',
-        country: 'Brasil',
+        country: '',
         
         // Configurações do Site
         maintenanceMode: false,
-        orderNotifications: true,
-        autoBackup: true,
+        orderNotifications: false,
+        autoBackup: false,
         
         // SEO e Meta
-        siteTitle: 'CodeForge - Desenvolvimento de Bots e Sites',
-        siteDescription: 'Especialistas em desenvolvimento de bots para Discord e WhatsApp, sites e design.',
-        keywords: 'bots, discord, whatsapp, sites, desenvolvimento, design',
+        siteTitle: '',
+        siteDescription: '',
+        keywords: '',
         
         // Social Media
         facebook: '',
@@ -305,7 +371,7 @@ class FirebaseDataService {
         youtube: '',
         
         // Configurações de Negócio
-        businessHours: 'Segunda a Sexta, 9h às 18h',
+        businessHours: '',
         timezone: 'America/Sao_Paulo',
         currency: 'BRL',
         
@@ -1034,14 +1100,17 @@ class FirebaseDataService {
   }
 
   onMainCategoriesSnapshot(callback: (categories: MainCategory[]) => void): () => void {
+
     const q = query(collection(db!, 'mainCategories'), orderBy('order', 'asc'))
     return onSnapshot(q, (querySnapshot) => {
+      
       const categories = querySnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data(),
         createdAt: doc.data().createdAt?.toDate() || new Date(),
         updatedAt: doc.data().updatedAt?.toDate() || new Date(),
       })) as MainCategory[]
+      
       callback(categories)
     })
   }
@@ -1244,6 +1313,205 @@ class FirebaseDataService {
       callback(keys)
     })
   }
+
+  // ===== FOUNDERS =====
+  async getFounders(): Promise<Founder[]> {
+    try {
+      const q = query(
+        collection(db!, 'founders'),
+        orderBy('order', 'asc')
+      )
+      const querySnapshot = await getDocs(q)
+      
+      return querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as Founder[]
+    } catch (error) {
+      console.error('Erro ao buscar fundadores:', error)
+      return []
+    }
+  }
+
+  async addFounder(founder: Omit<Founder, 'id' | 'createdAt' | 'updatedAt'>): Promise<string | null> {
+    try {
+      const docRef = await addDoc(collection(db!, 'founders'), {
+        ...founder,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      })
+      return docRef.id
+    } catch (error) {
+      console.error('Erro ao adicionar fundador:', error)
+      return null
+    }
+  }
+
+  async updateFounder(id: string, updates: Partial<Founder>): Promise<boolean> {
+    try {
+      const docRef = doc(db!, 'founders', id)
+      await updateDoc(docRef, {
+        ...updates,
+        updatedAt: serverTimestamp()
+      })
+      return true
+    } catch (error) {
+      console.error('Erro ao atualizar fundador:', error)
+      return false
+    }
+  }
+
+  async deleteFounder(id: string): Promise<boolean> {
+    try {
+      const docRef = doc(db!, 'founders', id)
+      await deleteDoc(docRef)
+      return true
+    } catch (error) {
+      console.error('Erro ao deletar fundador:', error)
+      return false
+    }
+  }
+
+  onFoundersChange(callback: (founders: Founder[]) => void) {
+    const q = query(
+      collection(db!, 'founders'),
+      orderBy('order', 'asc')
+    )
+    
+    return onSnapshot(q, (querySnapshot) => {
+      const founders = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as Founder[]
+      callback(founders)
+    })
+  }
+
+  // ===== PLAN ORDERS =====
+  async addPlanOrder(order: PlanOrder): Promise<void> {
+    try {
+      await setDoc(doc(db!, 'planOrders', order.id), {
+        ...order,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      })
+    } catch (error) {
+      console.error('Erro ao adicionar ordem de plano:', error)
+      throw error
+    }
+  }
+
+  // ===== ORDERS =====
+  async addOrderFromPlan(order: any): Promise<void> {
+    try {
+      await setDoc(doc(db!, 'orders', order.id), {
+        ...order,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      })
+    } catch (error) {
+      console.error('Erro ao adicionar pedido de plano:', error)
+      throw error
+    }
+  }
+
+  async getPlanOrders(): Promise<PlanOrder[]> {
+    try {
+      const q = query(
+        collection(db!, 'planOrders'),
+        orderBy('createdAt', 'desc')
+      )
+      const querySnapshot = await getDocs(q)
+      
+      return querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        createdAt: doc.data().createdAt?.toDate() || new Date(),
+        updatedAt: doc.data().updatedAt?.toDate() || new Date()
+      })) as PlanOrder[]
+    } catch (error) {
+      console.error('Erro ao buscar ordens de planos:', error)
+      return []
+    }
+  }
+
+  async updatePlanOrder(orderId: string, updates: Partial<PlanOrder>): Promise<void> {
+    try {
+      const docRef = doc(db!, 'planOrders', orderId)
+      await updateDoc(docRef, {
+        ...updates,
+        updatedAt: serverTimestamp()
+      })
+    } catch (error) {
+      console.error('Erro ao atualizar ordem de plano:', error)
+      throw error
+    }
+  }
+
+  // ===== NOTIFICATIONS =====
+  async addNotification(notification: any): Promise<void> {
+    try {
+      await setDoc(doc(db!, 'notifications', notification.id), {
+        ...notification,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      })
+    } catch (error) {
+      console.error('Erro ao adicionar notificação:', error)
+      throw error
+    }
+  }
+
+  async getNotifications(): Promise<any[]> {
+    try {
+      const q = query(
+        collection(db!, 'notifications'),
+        orderBy('createdAt', 'desc')
+      )
+      const querySnapshot = await getDocs(q)
+      
+      return querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        createdAt: doc.data().createdAt?.toDate() || new Date(),
+        updatedAt: doc.data().updatedAt?.toDate() || new Date()
+      }))
+    } catch (error) {
+      console.error('Erro ao buscar notificações:', error)
+      return []
+    }
+  }
+
+  async updateNotification(notificationId: string, updates: any): Promise<void> {
+    try {
+      const docRef = doc(db!, 'notifications', notificationId)
+      await updateDoc(docRef, {
+        ...updates,
+        updatedAt: serverTimestamp()
+      })
+    } catch (error) {
+      console.error('Erro ao atualizar notificação:', error)
+      throw error
+    }
+  }
+
+  onNotificationsChange(callback: (notifications: any[]) => void) {
+    const q = query(
+      collection(db!, 'notifications'),
+      orderBy('createdAt', 'desc')
+    )
+    
+    return onSnapshot(q, (querySnapshot) => {
+      const notifications = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        createdAt: doc.data().createdAt?.toDate() || new Date(),
+        updatedAt: doc.data().updatedAt?.toDate() || new Date()
+      }))
+      callback(notifications)
+    })
+  }
+
 }
 
 export default FirebaseDataService

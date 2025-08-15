@@ -61,8 +61,8 @@ export default function GeneralDemo({ formData, isOpen, onClose }: GeneralDemoPr
     }
     
     return formData.projectType === "bot" 
-      ? ["Comandos personalizados", "Banco de dados", "Painel admin", "Logs detalhados"]
-      : ["Design responsivo", "SEO otimizado", "Painel admin", "Formulários"]
+      ? ["Comandos personalizados", "Banco de dados", "Sistema de logs", "Logs detalhados"]
+: ["Design responsivo", "SEO otimizado", "Sistema de gestão", "Formulários"]
   }
 
   return (

@@ -15,7 +15,8 @@ import FirebaseDataService, {
   BotConfig,
   DevKey,
   Service,
-  Plan
+  Plan,
+  Founder
 } from '@/lib/firebase-data-service'
 
 const firebaseService = FirebaseDataService.getInstance()
@@ -580,7 +581,26 @@ export function useMainCategories() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
+    // Carregar dados iniciais
+    const loadInitialData = async () => {
+      try {
+        const initialData = await firebaseService.getMainCategories()
+
+        setCategories(initialData.filter(cat => cat.active))
+        setLoading(false)
+        setError(null)
+      } catch (err) {
+        console.error('Erro ao carregar dados iniciais:', err)
+        setError('Erro ao carregar categorias')
+        setLoading(false)
+      }
+    }
+
+    loadInitialData()
+
+    // Configurar listener em tempo real
     const unsubscribe = firebaseService.onMainCategoriesSnapshot((data) => {
+
       setCategories(data.filter(cat => cat.active))
       setLoading(false)
       setError(null)
@@ -781,4 +801,70 @@ export function useDevKeys() {
     deleteDevKey,
     logDevKeyUsage,
   }
+}
+
+export function useFounders() {
+  const [founders, setFounders] = useState<Founder[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    let isMounted = true
+    
+    const unsubscribe = firebaseService.onFoundersChange((newFounders) => {
+      if (isMounted) {
+        // Otimização: Filtro memoizado para evitar recálculos desnecessários
+        const activeFounders = newFounders.filter(founder => founder.active)
+        setFounders(activeFounders)
+        setLoading(false)
+        setError(null)
+      }
+    })
+
+    return () => {
+      isMounted = false
+      unsubscribe()
+    }
+  }, [])
+
+  const addFounder = async (founder: Omit<Founder, 'id' | 'createdAt' | 'updatedAt'>) => {
+    try {
+      setError(null)
+      const id = await firebaseService.addFounder(founder)
+      return id
+    } catch (err) {
+      setError('Erro ao adicionar fundador')
+      return null
+    }
+  }
+
+  const updateFounder = async (id: string, updates: Partial<Founder>) => {
+    try {
+      setError(null)
+      const success = await firebaseService.updateFounder(id, updates)
+      if (!success) {
+        setError('Erro ao atualizar fundador')
+      }
+      return success
+    } catch (err) {
+      setError('Erro ao atualizar fundador')
+      return false
+    }
+  }
+
+  const deleteFounder = async (id: string) => {
+    try {
+      setError(null)
+      const success = await firebaseService.deleteFounder(id)
+      if (!success) {
+        setError('Erro ao deletar fundador')
+      }
+      return success
+    } catch (err) {
+      setError('Erro ao deletar fundador')
+      return false
+    }
+  }
+
+  return { founders, loading, error, addFounder, updateFounder, deleteFounder }
 }

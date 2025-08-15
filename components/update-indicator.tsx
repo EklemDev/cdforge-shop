@@ -71,7 +71,7 @@ export default function UpdateIndicator() {
   }
 
   return (
-    <div className="fixed top-2 right-2 z-50 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-medium shadow-lg flex items-center gap-1 animate-pulse">
+    <div className="fixed top-20 right-4 z-40 bg-green-500 text-white px-3 py-2 rounded-lg text-xs font-medium shadow-lg flex items-center gap-2 animate-pulse">
       <Clock className="w-3 h-3" />
       <span>Atualizado em {updateTime}</span>
     </div>

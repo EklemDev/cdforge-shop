@@ -45,7 +45,7 @@ const commonFeatures = [
   "Sistema de comandos personalizados",
   "Banco de dados integrado",
   "Sistema de logs",
-  "Painel administrativo",
+  "Sistema de gestão",
   "Backup automático",
   "Suporte técnico",
   "Atualizações gratuitas por 3 meses",

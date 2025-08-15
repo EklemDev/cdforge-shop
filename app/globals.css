@@ -199,9 +199,97 @@ html {
   background-size: 300% 300%;
 }
 
-/* Dark mode transitions */
+/* Otimizações de Performance */
 * {
-  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+  box-sizing: border-box;
+}
+
+/* Otimização: Transições apenas para elementos que precisam */
+.transition-optimized {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+/* Otimização: Aceleração de hardware para animações */
+.gpu-accelerated {
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+/* Otimização: Touch actions para mobile */
+.touch-optimized {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Otimização: Scroll suave apenas quando necessário */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px; /* Para header fixo */
+}
+
+/* Otimização: Prevenção de layout shift */
+img, video, canvas, audio, iframe, embed, object {
+  display: block;
+  max-width: 100%;
+}
+
+/* Otimização: Focus visível para acessibilidade */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Otimizações específicas para mobile */
+@media (max-width: 768px) {
+  /* Prevenir zoom em inputs */
+  input, textarea, select {
+    font-size: 16px !important;
+  }
+  
+  /* Otimizar botões para touch */
+  button, a {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Melhorar espaçamento para touch */
+  .touch-target {
+    padding: 12px;
+    margin: 4px;
+  }
+  
+  /* Otimizar scroll durante animações */
+  .is-scrolling * {
+    animation-play-state: paused !important;
+  }
+  
+  /* Prevenir seleção de texto em botões */
+  button, a {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+}
+
+/* Otimização: Reduzir motion para usuários que preferem */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Dark mode transitions otimizadas */
+.dark * {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
 
 /* Efeitos adicionais para a marca */
@@ -217,4 +305,23 @@ html {
 
 .animate-power-pulse {
   animation: power-pulse 3s ease-in-out infinite;
+}
+
+/* Adicionando estilos personalizados para o design sofisticado */
+@layer components {
+  .glass-effect {
+    @apply bg-white/60 backdrop-blur-xl;
+  }
+
+  .gradient-text {
+    @apply bg-gradient-to-r from-slate-900 via-blue-800 to-green-700 bg-clip-text text-transparent;
+  }
+
+  .card-hover {
+    @apply hover:shadow-xl transition-all duration-300 hover:scale-[1.02];
+  }
+
+  .animate-pulse-slow {
+    animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
 }

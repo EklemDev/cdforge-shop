@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback, useMemo } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -10,9 +10,61 @@ export default function Header() {
   const router = useRouter()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [currentPath, setCurrentPath] = useState('')
 
   useEffect(() => {
     setMounted(true)
+    // Detectar a rota atual
+    setCurrentPath(window.location.pathname)
+    
+    // Listener para mudanças de rota
+    const handleRouteChange = () => {
+      setCurrentPath(window.location.pathname)
+    }
+    
+    // Adicionar listener para mudanças de rota
+    window.addEventListener('popstate', handleRouteChange)
+    
+    // Cleanup
+    return () => {
+      window.removeEventListener('popstate', handleRouteChange)
+    }
+  }, [])
+
+  // Função para verificar se uma rota está ativa
+  const isActiveRoute = (path: string) => {
+    return currentPath === path
+  }
+
+  // Função para obter classes CSS baseadas no estado ativo
+  const getNavButtonClasses = (path: string) => {
+    const baseClasses = "transition-all duration-300 font-medium cursor-pointer relative"
+    const activeClasses = "text-blue-600 dark:text-blue-400 font-semibold"
+    const inactiveClasses = "text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400"
+    
+    return `${baseClasses} ${isActiveRoute(path) ? activeClasses : inactiveClasses}`
+  }
+
+  // Função para navegar e atualizar o estado ativo - Otimizada com useCallback
+  const handleNavigation = useCallback((path: string) => {
+    setCurrentPath(path)
+    router.push(path)
+  }, [router])
+
+  // Otimização: Memoização das classes CSS para evitar recálculos
+  const navButtonClasses = useMemo(() => ({
+    planos: getNavButtonClasses('/planos'),
+    categorias: getNavButtonClasses('/categorias'),
+    fundadores: getNavButtonClasses('/fundadores')
+  }), [currentPath])
+
+  // Otimização: Callbacks para botões específicos
+  const handlePlanosClick = useCallback(() => handleNavigation('/planos'), [handleNavigation])
+  const handleCategoriasClick = useCallback(() => handleNavigation('/categorias'), [handleNavigation])
+  const handleFundadoresClick = useCallback(() => handleNavigation('/fundadores'), [handleNavigation])
+  const handleAjudaClick = useCallback(() => router.push('/ajuda'), [router])
+  const handleDiscordClick = useCallback(() => {
+    window.open('https://discord.gg/jp2BzA4H', '_blank', 'noopener,noreferrer')
   }, [])
 
   if (!mounted) {
@@ -42,36 +94,59 @@ export default function Header() {
             {/* Left spacer for balance */}
             <div className="hidden md:flex w-32"></div>
 
-            {/* Centered Desktop Navigation */}
+            {/* Centered Desktop Navigation Otimizada */}
             <nav className="hidden md:flex items-center space-x-8">
               <button
-                onClick={() => router.push('/planos')}
-                className="text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 transition-colors font-medium cursor-pointer"
+                onClick={handlePlanosClick}
+                className={navButtonClasses.planos}
+                style={{ touchAction: 'manipulation' }}
               >
                 Planos
+                {/* Indicador ativo com sublinhado animado */}
+                {isActiveRoute('/planos') && (
+                  <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full animate-pulse"></div>
+                )}
               </button>
               <button
-                onClick={() => router.push('/categorias')}
-                className="text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 transition-colors font-medium cursor-pointer"
+                onClick={handleCategoriasClick}
+                className={navButtonClasses.categorias}
+                style={{ touchAction: 'manipulation' }}
               >
                 Categorias
+                {/* Indicador ativo com sublinhado animado */}
+                {isActiveRoute('/categorias') && (
+                  <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full animate-pulse"></div>
+                )}
+              </button>
+              <button
+                onClick={handleFundadoresClick}
+                className={navButtonClasses.fundadores}
+                style={{ touchAction: 'manipulation' }}
+              >
+                Fundadores
+                {/* Indicador ativo com sublinhado animado */}
+                {isActiveRoute('/fundadores') && (
+                  <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full animate-pulse"></div>
+                )}
               </button>
             </nav>
 
-            {/* Right side buttons */}
+            {/* Right side buttons Otimizados */}
             <div className="hidden md:flex items-center space-x-3 w-32 justify-end">
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => router.push('/ajuda')}
-                className="border-red-300 text-red-600 hover:bg-red-50 dark:border-red-600 dark:text-red-400 dark:hover:bg-red-900/20 transition-all duration-300 bg-transparent cursor-pointer"
+                onClick={handleAjudaClick}
+                className="border-red-300 text-red-600 hover:bg-red-50 dark:border-red-600 dark:text-red-400 dark:hover:bg-red-900/20 transition-all duration-200 bg-transparent cursor-pointer active:scale-95 transform-gpu"
+                style={{ touchAction: 'manipulation' }}
               >
                 Ajuda
               </Button>
 
               <Button
-                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-all duration-300 hover:scale-105 cursor-pointer"
-                onClick={() => window.open('https://discord.gg/jp2BzA4H', '_blank')}
+                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-all duration-200 hover:scale-105 cursor-pointer active:scale-95 transform-gpu"
+                onClick={handleDiscordClick}
+                style={{ touchAction: 'manipulation' }}
               >
                 Discord
               </Button>
@@ -94,19 +169,43 @@ export default function Header() {
             <nav className="flex flex-col space-y-4 items-center">
               <button
                 onClick={() => {
-                  router.push('/planos')
+                  handleNavigation('/planos')
                   setIsMenuOpen(false)
                 }}
-                className="text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 transition-colors font-medium cursor-pointer"
+                className={`${getNavButtonClasses('/planos')} relative`}
               >
                 Planos
+                {/* Indicador ativo para mobile */}
+                {isActiveRoute('/planos') && (
+                  <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-8 h-0.5 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full animate-pulse"></div>
+                )}
               </button>
-              <Link
-                href="/categorias"
-                className="text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 transition-colors font-medium"
+              <button
+                onClick={() => {
+                  handleNavigation('/categorias')
+                  setIsMenuOpen(false)
+                }}
+                className={`${getNavButtonClasses('/categorias')} relative`}
               >
                 Categorias
-              </Link>
+                {/* Indicador ativo para mobile */}
+                {isActiveRoute('/categorias') && (
+                  <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-8 h-0.5 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full animate-pulse"></div>
+                )}
+              </button>
+              <button
+                onClick={() => {
+                  handleNavigation('/fundadores')
+                  setIsMenuOpen(false)
+                }}
+                className={`${getNavButtonClasses('/fundadores')} relative`}
+              >
+                Fundadores
+                {/* Indicador ativo para mobile */}
+                {isActiveRoute('/fundadores') && (
+                  <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-8 h-0.5 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full animate-pulse"></div>
+                )}
+              </button>
               <Link
                 href="/ajuda"
                 className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors font-medium"

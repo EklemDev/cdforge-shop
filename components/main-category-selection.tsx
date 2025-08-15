@@ -1,11 +1,13 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Bot, Globe, Palette, Settings } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
-import { useMainCategories } from "@/hooks/useFirebaseData"
+import FirebaseDataService from "@/lib/firebase-data-service"
+import { MainCategory } from "@/lib/firebase-data-service"
 
 // Mapeamento de ícones Lucide
 const iconMap: { [key: string]: any } = {
@@ -16,7 +18,28 @@ const iconMap: { [key: string]: any } = {
 }
 
 export default function MainCategorySelection() {
-  const { categories, loading } = useMainCategories()
+  const [categories, setCategories] = useState<MainCategory[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const firebaseService = FirebaseDataService.getInstance()
+    
+    const loadCategories = async () => {
+      try {
+        const data = await firebaseService.getMainCategories()
+
+        setCategories(data.filter(cat => cat.active))
+        setLoading(false)
+      } catch (error) {
+        console.error('Erro ao carregar categorias:', error)
+        setLoading(false)
+      }
+    }
+
+    loadCategories()
+  }, [])
+
+
 
   if (loading) {
     return (

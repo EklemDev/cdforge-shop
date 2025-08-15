@@ -149,7 +149,7 @@ async function initializeFirebase() {
       {
         name: 'Site E-commerce',
         description: 'Loja virtual completa',
-        features: ['Catálogo de produtos', 'Carrinho de compras', 'Pagamentos online', 'Painel administrativo'],
+        features: ['Catálogo de produtos', 'Carrinho de compras', 'Pagamentos online', 'Sistema de gestão'],
         categoryId: 'ecommerce',
         active: true,
         order: 1
@@ -306,7 +306,7 @@ async function initializeFirebase() {
         icon: 'globe',
         type: 'site' as const,
         category: 'Web',
-        features: ['Design responsivo', 'SEO otimizado', 'Painel administrativo', 'Integração com redes sociais'],
+        features: ['Design responsivo', 'SEO otimizado', 'Sistema de gestão', 'Integração com redes sociais'],
         benefits: ['Presença online profissional', 'Maior visibilidade', 'Facilidade de gestão'],
         process: ['Briefing', 'Design', 'Desenvolvimento', 'Testes e lançamento'],
         examples: ['Site institucional', 'E-commerce', 'Blog', 'Portfolio'],
@@ -435,6 +435,75 @@ async function initializeFirebase() {
     console.log("🌐 Inicializando categorias principais...")
     for (const category of defaultMainCategories) {
       await firebaseService.addMainCategory(category)
+    }
+
+    // Founders
+    const defaultFounders = [
+      {
+        name: "M E L K E",
+        role: "Desenvolvedor Full-Stack",
+        location: "Petrolina, PE",
+        availability: {
+          start: "20:00",
+          end: "02:00",
+          timezone: "GMT-3"
+        },
+        specialties: ["Web Development", "Mobile Apps", "UI/UX Design"],
+        icon: "Code",
+        color: "blue",
+        bgGradient: "from-blue-500 to-purple-600",
+        isOnline: true,
+        discordId: "melke_official",
+        email: "melke@codeforge.dev",
+        phone: "(11) 99999-9999",
+        active: true,
+        order: 1
+      },
+      {
+        name: "ZANESCO",
+        role: "Arquiteto de Sistemas",
+        location: "São Paulo, SP",
+        availability: {
+          start: "22:00",
+          end: "09:00",
+          timezone: "GMT-3"
+        },
+        specialties: ["Bot Development", "System Automation", "API Integration"],
+        icon: "Terminal",
+        color: "purple",
+        bgGradient: "from-purple-500 to-cyan-600",
+        isOnline: true,
+        discordId: "zanesco_dev",
+        email: "zanesco@codeforge.dev",
+        phone: "(11) 99999-9998",
+        active: true,
+        order: 2
+      },
+      {
+        name: "PEDRO",
+        role: "Agente Oficial",
+        location: "São Paulo, SP",
+        availability: {
+          start: "12:00",
+          end: "04:00",
+          timezone: "GMT-3"
+        },
+        specialties: ["Business Development", "Client Relations", "Project Management"],
+        icon: "Handshake",
+        color: "green",
+        bgGradient: "from-green-500 to-emerald-600",
+        isOnline: true,
+        discordId: "pedro_agent",
+        email: "pedro@codeforge.dev",
+        phone: "(11) 99999-9997",
+        active: true,
+        order: 3
+      }
+    ]
+
+    console.log("👥 Inicializando fundadores...")
+    for (const founder of defaultFounders) {
+      await firebaseService.addFounder(founder)
     }
 
     // Bot Config
