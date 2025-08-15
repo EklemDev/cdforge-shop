@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback, useMemo } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Bot, Globe, Palette, Settings } from "lucide-react"
@@ -9,50 +9,75 @@ import { MainCategory } from "@/lib/firebase-data-service"
 import DynamicOrderForm from "./dynamic-order-form"
 import DynamicCategoryCarousel from "./dynamic-category-carousel"
 
-const iconMap: { [key: string]: any } = {
+// Mapa de ícones memoizado
+const iconMap = useMemo(() => ({
   Bot,
   Globe,
   Palette,
   Settings,
-}
+} as const), [])
 
 export default function SimpleCategoryDisplay() {
   const [categories, setCategories] = useState<MainCategory[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedCategory, setSelectedCategory] = useState<MainCategory | null>(null)
 
+  // Otimização: Carregamento de dados com cleanup
   useEffect(() => {
+    let isMounted = true
+
     const loadCategories = async () => {
       try {
         const firebaseService = FirebaseDataService.getInstance()
         const data = await firebaseService.getMainCategories()
 
-        setCategories(data.filter(cat => cat.active))
-        setLoading(false)
+        if (isMounted) {
+          setCategories(data.filter(cat => cat.active))
+          setLoading(false)
+        }
       } catch (error) {
         console.error('Erro:', error)
-        setLoading(false)
+        if (isMounted) {
+          setLoading(false)
+        }
       }
     }
 
     loadCategories()
+
+    return () => {
+      isMounted = false
+    }
   }, [])
 
-  const handleCategorySelect = (category: MainCategory) => {
+  // Otimização: Callbacks memoizados
+  const handleCategorySelect = useCallback((category: MainCategory) => {
     setSelectedCategory(category)
-  }
+  }, [])
 
-  const handleBack = () => {
+  const handleBack = useCallback(() => {
     setSelectedCategory(null)
-  }
+  }, [])
 
-  if (selectedCategory) {
-    return <DynamicOrderForm category={selectedCategory} onBack={handleBack} />
-  }
+  // Otimização: Renderização condicional memoizada
+  const renderContent = useMemo(() => {
+    if (selectedCategory) {
+      return <DynamicOrderForm category={selectedCategory} onBack={handleBack} />
+    }
 
-  // Use the new dynamic carousel instead of the old grid layout
-  return <DynamicCategoryCarousel onCategorySelect={handleCategorySelect} />
+    if (loading) {
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
+          <div className="text-center">
+            <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-gray-600">Carregando categorias...</p>
+          </div>
+        </div>
+      )
+    }
 
-  // Loading state is now handled by DynamicCategoryCarousel
-  return null
+    return <DynamicCategoryCarousel onCategorySelect={handleCategorySelect} />
+  }, [selectedCategory, loading, handleCategorySelect, handleBack])
+
+  return renderContent
 }

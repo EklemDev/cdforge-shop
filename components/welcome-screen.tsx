@@ -5,7 +5,7 @@ import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { useCallback, useMemo } from "react"
 import { Code, Cpu, Terminal, MessageCircle, Users, Handshake, MapPin, Clock } from "lucide-react"
-import PricingDisplay from "./pricing-display"
+
 import { useFounders } from "@/hooks/useFirebaseData"
 
 // Mapa de ícones memoizado para evitar recriações
@@ -262,8 +262,7 @@ export default function WelcomeScreen() {
       </div>
     </section>
 
-    {/* Seção de Preços Sincronizados */}
-    <PricingDisplay />
+
   </>
   )
 }

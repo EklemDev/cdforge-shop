@@ -287,6 +287,64 @@ textarea:focus-visible {
   }
 }
 
+/* Otimizações específicas para carrosséis e navegação */
+.carousel-container {
+  contain: layout style paint;
+  will-change: transform;
+}
+
+.carousel-item {
+  contain: layout style paint;
+  will-change: transform, opacity;
+}
+
+.navigation-button {
+  contain: layout style paint;
+  will-change: transform;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Otimização: Lazy loading para imagens */
+.lazy-image {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.lazy-image.loaded {
+  opacity: 1;
+}
+
+/* Otimização: Prevenção de layout shift em carrosséis */
+.carousel-wrapper {
+  min-height: 400px;
+  contain: layout style paint;
+}
+
+/* Otimização: Botões de navegação responsivos */
+@media (max-width: 640px) {
+  .navigation-button {
+    min-width: 48px;
+    min-height: 48px;
+    padding: 12px;
+  }
+  
+  .carousel-container {
+    padding: 0 8px;
+  }
+}
+
+/* Otimização: Performance para dispositivos de baixa capacidade */
+@media (max-width: 480px) {
+  .carousel-item {
+    will-change: auto;
+  }
+  
+  .navigation-button {
+    will-change: auto;
+  }
+}
+
 /* Dark mode transitions otimizadas */
 .dark * {
   transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;

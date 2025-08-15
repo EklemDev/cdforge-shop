@@ -1,19 +1,19 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { motion, AnimatePresence } from "framer-motion"
+import { useState, useEffect, useCallback, useMemo } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Bot, Globe, Palette, Settings, ChevronLeft, ChevronRight, Sparkles, Zap, Star, ArrowRight } from "lucide-react"
 import FirebaseDataService from "@/lib/firebase-data-service"
 import { MainCategory } from "@/lib/firebase-data-service"
 
-const iconMap: { [key: string]: any } = {
+// Mapa de ícones memoizado para evitar recriações
+const iconMap = useMemo(() => ({
   Bot,
   Globe,
   Palette,
   Settings,
-}
+} as const), [])
 
 interface DynamicCategoryCarouselProps {
   onCategorySelect: (category: MainCategory) => void
@@ -24,455 +24,243 @@ export default function DynamicCategoryCarousel({ onCategorySelect }: DynamicCat
   const [loading, setLoading] = useState(true)
   const [currentIndex, setCurrentIndex] = useState(0)
   const [selectedCategory, setSelectedCategory] = useState<MainCategory | null>(null)
-  const [isHovering, setIsHovering] = useState(false)
 
+  // Otimização: Carregamento de dados com memoização
   useEffect(() => {
+    let isMounted = true
+
     const loadCategories = async () => {
       try {
         const firebaseService = FirebaseDataService.getInstance()
         const data = await firebaseService.getMainCategories()
-        setCategories(data.filter(cat => cat.active))
-        setLoading(false)
+        
+        if (isMounted) {
+          setCategories(data.filter(cat => cat.active))
+          setLoading(false)
+        }
       } catch (error) {
         console.error('Erro:', error)
-        setLoading(false)
+        if (isMounted) {
+          setLoading(false)
+        }
       }
     }
 
     loadCategories()
+
+    return () => {
+      isMounted = false
+    }
   }, [])
 
-  const nextSlide = () => {
+  // Otimização: Callbacks memoizados para evitar re-renders
+  const nextSlide = useCallback(() => {
     setCurrentIndex((prev) => (prev + 1) % categories.length)
-  }
+  }, [categories.length])
 
-  const prevSlide = () => {
-    setCurrentIndex((prev) => (prev - 1 + categories.length) % categories.length
-    )
-  }
+  const prevSlide = useCallback(() => {
+    setCurrentIndex((prev) => (prev - 1 + categories.length) % categories.length)
+  }, [categories.length])
 
-  const handleCategoryClick = (category: MainCategory) => {
+  const handleCategoryClick = useCallback((category: MainCategory) => {
     setSelectedCategory(category)
     
-    // Animate the selection with enhanced feedback
-    setTimeout(() => {
-      onCategorySelect(category)
-    }, 800)
-  }
+    // Feedback visual imediato sem delay
+    onCategorySelect(category)
+  }, [onCategorySelect])
 
-  const getCategoryBenefits = (categoryTitle: string) => {
-    switch (categoryTitle.toLowerCase()) {
-      case "bots":
-        return [
-          "🚀 Automatize 80% das tarefas repetitivas",
-          "💰 Reduza custos operacionais em até 60%",
-          "⚡ Atenda clientes 24/7 sem interrupções",
-          "📈 Aumente conversões com atendimento instantâneo"
-        ]
-      case "sites":
-        return [
-          "🎯 Sites que convertem visitantes em clientes",
-          "📱 Perfeitos em todos os dispositivos",
-          "🔍 Otimizados para aparecer no Google",
-          "⚡ Carregamento ultra-rápido e seguro"
-        ]
-      case "design":
-        return [
-          "🎨 Identidade visual que marca presença",
-          "💎 Design premium que inspira confiança",
-          "📱 Material pronto para todas as redes",
-          "✨ Experiência visual memorável"
-        ]
-      case "assistência":
-        return [
-          "🎯 Estratégias que geram resultados reais",
-          "📊 Análises detalhadas do seu Instagram",
-          "🛠️ Suporte técnico especializado",
-          "📈 Crescimento orgânico e sustentável"
-        ]
-      default:
-        return []
+  // Otimização: Benefícios memoizados
+  const getCategoryBenefits = useCallback((categoryTitle: string) => {
+    const benefitsMap = {
+      "bots": [
+        "🚀 Automatize 80% das tarefas repetitivas",
+        "💰 Reduza custos operacionais em até 60%",
+        "⚡ Atenda clientes 24/7 sem interrupções",
+        "📈 Aumente conversões com atendimento instantâneo"
+      ],
+      "sites": [
+        "🎯 Sites que convertem visitantes em clientes",
+        "📱 Perfeitos em todos os dispositivos",
+        "🔍 Otimizados para aparecer no Google",
+        "⚡ Carregamento ultra-rápido e seguro"
+      ],
+      "design": [
+        "🎨 Identidade visual que marca presença",
+        "💎 Design premium que inspira confiança",
+        "📱 Material pronto para todas as redes",
+        "✨ Experiência visual memorável"
+      ],
+      "assistência": [
+        "🎯 Estratégias que geram resultados reais",
+        "📊 Análises detalhadas do seu Instagram",
+        "🛠️ Suporte técnico especializado",
+        "📈 Crescimento orgânico e sustentável"
+      ]
     }
-  }
+    
+    return benefitsMap[categoryTitle.toLowerCase() as keyof typeof benefitsMap] || []
+  }, [])
 
+  // Otimização: Loading state simplificado
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
-        <motion.div
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          className="text-center"
-        >
-          <div className="relative">
-            <div className="w-20 h-20 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto"></div>
-            <Sparkles className="absolute -top-2 -right-2 w-6 h-6 text-purple-500 animate-pulse" />
-          </div>
-          <motion.p 
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="mt-6 text-xl font-semibold text-gray-700"
-          >
-            Preparando sua experiência personalizada...
-          </motion.p>
-        </motion.div>
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Carregando categorias...</p>
+        </div>
       </div>
     )
   }
 
+  const currentCategory = categories[currentIndex]
+  if (!currentCategory) return null
+
+  const IconComponent = (iconMap as any)[currentCategory.icon] || Bot
+  const benefits = getCategoryBenefits(currentCategory.title)
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 relative overflow-hidden">
-      {/* Enhanced animated background elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <motion.div
-          animate={{
-            x: [0, 100, 0],
-            y: [0, -50, 0],
-            rotate: [0, 180, 360],
-          }}
-          transition={{
-            duration: 30,
-            repeat: Infinity,
-            ease: "linear"
-          }}
-          className="absolute top-20 left-20 w-32 h-32 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full opacity-10 blur-xl"
-        />
-        <motion.div
-          animate={{
-            x: [0, -80, 0],
-            y: [0, 100, 0],
-            scale: [1, 1.2, 1],
-          }}
-          transition={{
-            duration: 25,
-            repeat: Infinity,
-            ease: "linear"
-          }}
-          className="absolute bottom-20 right-20 w-40 h-40 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full opacity-10 blur-xl"
-        />
-        <motion.div
-          animate={{
-            x: [0, 60, 0],
-            y: [0, -30, 0],
-            rotate: [0, -180, -360],
-          }}
-          transition={{
-            duration: 35,
-            repeat: Infinity,
-            ease: "linear"
-          }}
-          className="absolute top-1/2 left-1/3 w-24 h-24 bg-gradient-to-r from-green-400 to-blue-400 rounded-full opacity-8 blur-lg"
-        />
-      </div>
-
-      <div className="relative z-10 container mx-auto px-4 py-20">
-        {/* Enhanced Header with compelling copy */}
-        <motion.div
-          initial={{ y: -50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.8 }}
-          className="text-center mb-16"
-        >
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-            className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-full text-sm font-semibold mb-6"
-          >
-            <Star className="w-4 h-4" />
-            Transforme sua ideia em realidade
-            <Star className="w-4 h-4" />
-          </motion.div>
-          
-          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-6">
-            Qual solução você precisa?
+    <section className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 py-16">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header Otimizado */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
+            Escolha seu{" "}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
+              Serviço
+            </span>
           </h1>
-          <p className="text-xl sm:text-2xl text-gray-600 max-w-4xl mx-auto leading-relaxed mb-8">
-            Escolha a categoria que melhor se alinha com seus objetivos e deixe-nos transformar sua visão em resultados extraordinários
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            Soluções personalizadas para impulsionar seu negócio digital
           </p>
+        </div>
+
+        {/* Carousel Otimizado */}
+        <div className="relative max-w-6xl mx-auto carousel-container">
+          {/* Botões de Navegação Otimizados */}
+          <div className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-30">
+            <Button
+              onClick={prevSlide}
+              variant="ghost"
+              size="lg"
+              className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-white/90 backdrop-blur-sm hover:bg-white shadow-lg border-0 group cursor-pointer navigation-button"
+            >
+              <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 group-hover:text-blue-600 transition-colors duration-200" />
+            </Button>
+          </div>
           
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-            className="flex items-center justify-center gap-4 text-sm text-gray-500"
-          >
-                         <div className="flex items-center gap-2">
-               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-               <span>+0 projetos entregues</span>
-             </div>
-            <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
-                         <div className="flex items-center gap-2">
-               <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-               <span>0% de satisfação</span>
-             </div>
-            <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></div>
-              <span>Suporte 24/7</span>
-            </div>
-          </motion.div>
-        </motion.div>
-
-        {/* Enhanced Category Carousel */}
-        <div className="relative max-w-7xl mx-auto">
-          {/* Navigation Buttons */}
-          <motion.div
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            className="absolute left-4 top-1/2 -translate-y-1/2 z-30"
-          >
-                         <Button
-               onClick={prevSlide}
-               variant="ghost"
-               size="lg"
-               className="w-14 h-14 rounded-full bg-white/90 backdrop-blur-sm hover:bg-white shadow-xl border-0 group cursor-pointer"
-             >
-               <ChevronLeft className="w-6 h-6 group-hover:text-blue-600 transition-colors" />
-             </Button>
-          </motion.div>
-          
-          <motion.div
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            className="absolute right-4 top-1/2 -translate-y-1/2 z-30"
-          >
-                         <Button
-               onClick={nextSlide}
-               variant="ghost"
-               size="lg"
-               className="w-14 h-14 rounded-full bg-white/90 backdrop-blur-sm hover:bg-white shadow-xl border-0 group cursor-pointer"
-             >
-               <ChevronRight className="w-6 h-6 group-hover:text-blue-600 transition-colors" />
-             </Button>
-          </motion.div>
-
-          {/* Carousel Container */}
-          <div className="relative h-[700px] overflow-hidden pointer-events-none">
-            <AnimatePresence mode="wait">
-              {categories.map((category, index) => {
-                const IconComponent = iconMap[category.icon] || Bot
-                const isActive = index === currentIndex
-                const benefits = getCategoryBenefits(category.title)
-                
-                return (
-                  <motion.div
-                    key={category.id}
-                    initial={{ 
-                      scale: 0.8, 
-                      opacity: 0,
-                      x: index > currentIndex ? 400 : -400
-                    }}
-                    animate={{ 
-                      scale: isActive ? 1 : 0.85,
-                      opacity: isActive ? 1 : 0.2,
-                      x: 0
-                    }}
-                    exit={{ 
-                      scale: 0.8, 
-                      opacity: 0,
-                      x: index > currentIndex ? 400 : -400
-                    }}
-                    transition={{ 
-                      duration: 0.8,
-                      ease: "easeInOut"
-                    }}
-                    className={`absolute inset-0 flex items-center justify-center ${
-                      isActive ? 'z-10' : 'z-0'
-                    }`}
-                  >
-                    <Card
-                      className={`relative group cursor-pointer transition-all duration-700 pointer-events-auto ${
-                        isActive 
-                          ? 'w-full max-w-4xl h-[600px] shadow-2xl' 
-                          : 'w-96 h-[450px] shadow-lg'
-                      } border-0 overflow-hidden`}
-                      onClick={() => isActive && handleCategoryClick(category)}
-                      onMouseEnter={() => setIsHovering(true)}
-                      onMouseLeave={() => setIsHovering(false)}
-                    >
-                      {/* Enhanced animated background gradient */}
-                      <div 
-                        className={`absolute inset-0 bg-gradient-to-br ${
-                          category.title === 'BOTS' ? 'from-blue-500 via-cyan-500 to-blue-600' :
-                          category.title === 'SITES' ? 'from-green-500 via-emerald-500 to-green-600' :
-                          category.title === 'DESIGN' ? 'from-purple-500 via-pink-500 to-purple-600' :
-                          'from-orange-500 via-red-500 to-orange-600'
-                        } opacity-95`}
-                      />
-                      
-                      {/* Enhanced shimmer effect */}
-                      <motion.div
-                        animate={{
-                          x: [-200, 400],
-                        }}
-                        transition={{
-                          duration: 3,
-                          repeat: Infinity,
-                          ease: "linear"
-                        }}
-                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
-                      />
-
-                      {/* Floating particles effect */}
-                      {isActive && (
-                        <div className="absolute inset-0 overflow-hidden">
-                          {[...Array(6)].map((_, i) => (
-                            <motion.div
-                              key={i}
-                              animate={{
-                                y: [0, -20, 0],
-                                x: [0, 10, 0],
-                                opacity: [0.3, 0.8, 0.3],
-                              }}
-                              transition={{
-                                duration: 4 + i,
-                                repeat: Infinity,
-                                ease: "easeInOut",
-                                delay: i * 0.5,
-                              }}
-                              className="absolute w-2 h-2 bg-white/60 rounded-full"
-                              style={{
-                                left: `${20 + i * 15}%`,
-                                top: `${30 + i * 10}%`,
-                              }}
-                            />
-                          ))}
-                        </div>
-                      )}
-
-                      <CardContent className="relative z-10 p-8 h-full flex flex-col items-center justify-center text-center text-white">
-                        {/* Enhanced Icon */}
-                        <motion.div
-                          whileHover={{ scale: 1.15, rotate: 10 }}
-                          className={`w-28 h-28 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center mb-8 ${
-                            isActive ? 'shadow-2xl' : 'shadow-lg'
-                          } border-2 border-white/30`}
-                        >
-                          <IconComponent className="w-14 h-14" />
-                        </motion.div>
-
-                        {/* Enhanced Title */}
-                        <motion.h2
-                          initial={{ y: 20, opacity: 0 }}
-                          animate={{ y: 0, opacity: 1 }}
-                          transition={{ delay: 0.2 }}
-                          className={`font-bold mb-6 ${
-                            isActive ? 'text-5xl' : 'text-3xl'
-                          }`}
-                        >
-                          {category.title}
-                        </motion.h2>
-
-                        {/* Enhanced Description */}
-                        <motion.p
-                          initial={{ y: 20, opacity: 0 }}
-                          animate={{ y: 0, opacity: 1 }}
-                          transition={{ delay: 0.4 }}
-                          className={`mb-8 leading-relaxed ${
-                            isActive ? 'text-xl' : 'text-base'
-                          }`}
-                        >
-                          {category.description}
-                        </motion.p>
-
-                        {/* Benefits List - Only show for active card */}
-                        {isActive && (
-                          <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.6 }}
-                            className="mb-8"
-                          >
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-left">
-                              {benefits.map((benefit, idx) => (
-                                <motion.div
-                                  key={idx}
-                                  initial={{ opacity: 0, x: -20 }}
-                                  animate={{ opacity: 1, x: 0 }}
-                                  transition={{ delay: 0.8 + idx * 0.1 }}
-                                  className="flex items-center gap-2 text-sm"
-                                >
-                                  <span className="text-lg">{benefit.split(' ')[0]}</span>
-                                  <span>{benefit.split(' ').slice(1).join(' ')}</span>
-                                </motion.div>
-                              ))}
-                            </div>
-                          </motion.div>
-                        )}
-
-                        {/* Enhanced CTA Button */}
-                        {isActive && (
-                          <motion.div
-                            initial={{ scale: 0, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            transition={{ delay: 1, type: "spring", stiffness: 200 }}
-                          >
-                            <motion.div
-                              whileHover={{ scale: 1.05 }}
-                              whileTap={{ scale: 0.95 }}
-                            >
-                                                             <Button
-                                 size="lg"
-                                 className="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white border-2 border-white/40 hover:border-white/60 px-10 py-4 text-xl font-semibold rounded-full transition-all duration-300 hover:scale-105 shadow-2xl group cursor-pointer"
-                               >
-                                 <Sparkles className="w-6 h-6 mr-3 group-hover:animate-pulse" />
-                                 Começar Agora
-                                 <ArrowRight className="w-5 h-5 ml-3 group-hover:translate-x-1 transition-transform" />
-                               </Button>
-                            </motion.div>
-                          </motion.div>
-                        )}
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                )
-              })}
-            </AnimatePresence>
+          <div className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-30">
+            <Button
+              onClick={nextSlide}
+              variant="ghost"
+              size="lg"
+              className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-white/90 backdrop-blur-sm hover:bg-white shadow-lg border-0 group cursor-pointer navigation-button"
+            >
+              <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 group-hover:text-blue-600 transition-colors duration-200" />
+            </Button>
           </div>
 
-                     {/* Enhanced Dots indicator */}
-           <div className="flex justify-center mt-12 space-x-4">
-             {categories.map((_, index) => (
-               <motion.button
-                 key={index}
-                 onClick={() => setCurrentIndex(index)}
-                 className={`w-4 h-4 rounded-full transition-all duration-300 cursor-pointer ${
-                   index === currentIndex 
-                     ? 'bg-gradient-to-r from-blue-600 to-purple-600 scale-125 shadow-lg' 
-                     : 'bg-gray-300 hover:bg-gray-400'
-                 }`}
-                 whileHover={{ scale: 1.3 }}
-                 whileTap={{ scale: 0.8 }}
-               />
-             ))}
-           </div>
+          {/* Container do Carousel */}
+          <div className="relative h-[500px] sm:h-[600px] lg:h-[700px] overflow-hidden carousel-wrapper">
+            <Card
+              className="relative w-full h-full border-0 overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-xl carousel-item"
+              onClick={() => handleCategoryClick(currentCategory)}
+            >
+              {/* Background Gradiente Otimizado */}
+              <div 
+                className={`absolute inset-0 bg-gradient-to-br ${
+                  currentCategory.title === 'BOTS' ? 'from-blue-500 via-cyan-500 to-blue-600' :
+                  currentCategory.title === 'SITES' ? 'from-green-500 via-emerald-500 to-green-600' :
+                  currentCategory.title === 'DESIGN' ? 'from-purple-500 via-pink-500 to-purple-600' :
+                  'from-orange-500 via-red-500 to-orange-600'
+                }`}
+              />
 
-          {/* Trust indicators */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.2 }}
-            className="text-center mt-12"
-          >
-            <p className="text-gray-500 text-sm mb-4">Já confiaram em nós:</p>
-            <div className="flex items-center justify-center gap-8 text-gray-400">
-              <div className="flex items-center gap-2">
-                <Zap className="w-4 h-4" />
-                <span className="text-xs">Entrega rápida</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Star className="w-4 h-4" />
-                <span className="text-xs">Qualidade garantida</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4" />
-                <span className="text-xs">Suporte premium</span>
-              </div>
+              {/* Conteúdo Principal */}
+              <CardContent className="relative z-10 h-full flex flex-col justify-center items-center text-center text-white p-8">
+                {/* Ícone e Título */}
+                <div className="mb-8">
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center mb-6 mx-auto">
+                    <IconComponent className="w-10 h-10 sm:w-12 sm:h-12" />
+                  </div>
+                  <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4">
+                    {currentCategory.title}
+                  </h2>
+                  <p className="text-lg sm:text-xl text-white/90 max-w-2xl mx-auto">
+                    {currentCategory.description}
+                  </p>
+                </div>
+
+                {/* Benefícios */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8 max-w-4xl w-full">
+                  {benefits.map((benefit, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-lg p-4 text-left"
+                      style={{ 
+                        willChange: 'opacity',
+                        animationDelay: `${index * 100}ms`
+                      }}
+                    >
+                      <div className="flex-shrink-0">
+                        <div className="w-2 h-2 bg-white rounded-full"></div>
+                      </div>
+                      <span className="text-sm sm:text-base font-medium">
+                        {benefit}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Botão de Ação */}
+                <Button
+                  className="bg-white text-gray-900 hover:bg-gray-100 px-8 py-3 text-lg font-semibold rounded-full shadow-lg transition-all duration-200 hover:scale-105 navigation-button"
+                >
+                  <Sparkles className="w-5 h-5 mr-2" />
+                  Começar Agora
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Indicadores de Navegação */}
+          <div className="flex justify-center mt-8 gap-2">
+            {categories.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentIndex(index)}
+                className={`w-3 h-3 rounded-full transition-all duration-200 ${
+                  index === currentIndex 
+                    ? 'bg-blue-600 scale-125' 
+                    : 'bg-gray-300 hover:bg-gray-400'
+                }`}
+                style={{ touchAction: 'manipulation' }}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Informações Adicionais */}
+        <div className="mt-16 text-center">
+          <div className="flex flex-wrap justify-center items-center gap-6 text-sm text-gray-600">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+              <span>+100 projetos entregues</span>
             </div>
-          </motion.div>
+            <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+              <span>98% de satisfação</span>
+            </div>
+            <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+              <span>Suporte 24/7</span>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+    </section>
   )
 }
