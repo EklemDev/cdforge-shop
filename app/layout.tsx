@@ -7,6 +7,7 @@ import FaviconLoader from "@/components/favicon-loader"
 import UpdateIndicator from "@/components/update-indicator"
 import LoadingSpinner from "@/components/loading-spinner"
 import MobileOptimizer from "@/components/mobile-optimizer"
+import PreloadOptimizer from "@/components/preload-optimizer"
 
 // Otimização da fonte - pré-carregamento e display swap
 const inter = Inter({ 
@@ -84,7 +85,9 @@ export default function RootLayout({
         <LoadingSpinner show={false} />
         <MobileOptimizer />
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} disableTransitionOnChange={true}>
-          {children}
+          <PreloadOptimizer>
+            {children}
+          </PreloadOptimizer>
         </ThemeProvider>
       </body>
     </html>

@@ -9,13 +9,13 @@ import { MainCategory } from "@/lib/firebase-data-service"
 import DynamicOrderForm from "./dynamic-order-form"
 import DynamicCategoryCarousel from "./dynamic-category-carousel"
 
-// Mapa de ícones memoizado
-const iconMap = useMemo(() => ({
+// Mapa de ícones estático
+const iconMap = {
   Bot,
   Globe,
   Palette,
   Settings,
-} as const), [])
+} as const
 
 export default function SimpleCategoryDisplay() {
   const [categories, setCategories] = useState<MainCategory[]>([])

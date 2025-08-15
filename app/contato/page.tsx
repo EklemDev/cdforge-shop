@@ -1,5 +1,6 @@
 import Header from "@/components/header"
 import Footer from "@/components/footer"
+import ContactPlatforms from "@/components/contact-platforms"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -109,6 +110,9 @@ export default function ContatoPage() {
             </div>
           </div>
         </div>
+
+        {/* Seção de Plataformas de Contato */}
+        <ContactPlatforms />
       </main>
 
       <Footer />

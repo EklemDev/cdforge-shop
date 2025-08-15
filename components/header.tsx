@@ -5,6 +5,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Menu, X } from "lucide-react"
+import Image from "next/image"
 
 export default function Header() {
   const router = useRouter()
@@ -58,8 +59,8 @@ export default function Header() {
     fundadores: getNavButtonClasses('/fundadores')
   }), [currentPath])
 
-  // Otimização: Callbacks para botões específicos
-  const handlePlanosClick = useCallback(() => handleNavigation('/planos'), [handleNavigation])
+  // Otimização: Callbacks para botões específicos - sempre voltam para categorias
+  const handlePlanosClick = useCallback(() => handleNavigation('/categorias'), [handleNavigation])
   const handleCategoriasClick = useCallback(() => handleNavigation('/categorias'), [handleNavigation])
   const handleFundadoresClick = useCallback(() => handleNavigation('/fundadores'), [handleNavigation])
   const handleAjudaClick = useCallback(() => router.push('/ajuda'), [router])
@@ -91,8 +92,20 @@ export default function Header() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-center h-16">
           <div className="w-full max-w-6xl flex items-center justify-between">
-            {/* Left spacer for balance */}
-            <div className="hidden md:flex w-32"></div>
+            {/* Logo CodeForge */}
+            <div className="hidden md:flex items-center">
+              <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+                <Image
+                  src="/logo.png"
+                  alt="CodeForge"
+                  width={32}
+                  height={32}
+                  className="w-8 h-8 object-contain"
+                  style={{ willChange: 'transform' }}
+                />
+                <span className="text-lg font-bold text-gray-900 dark:text-white">CodeForge</span>
+              </Link>
+            </div>
 
             {/* Centered Desktop Navigation Otimizada */}
             <nav className="hidden md:flex items-center space-x-8">
@@ -166,17 +179,31 @@ export default function Header() {
         {/* Mobile Menu */}
         {isMenuOpen && (
           <div className="md:hidden py-4 border-t border-gray-100 dark:border-gray-800">
+            {/* Logo no mobile */}
+            <div className="flex justify-center mb-4">
+              <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+                <Image
+                  src="/logo.png"
+                  alt="CodeForge"
+                  width={24}
+                  height={24}
+                  className="w-6 h-6 object-contain"
+                  style={{ willChange: 'transform' }}
+                />
+                <span className="text-base font-bold text-gray-900 dark:text-white">CodeForge</span>
+              </Link>
+            </div>
             <nav className="flex flex-col space-y-4 items-center">
               <button
                 onClick={() => {
-                  handleNavigation('/planos')
+                  handleNavigation('/categorias')
                   setIsMenuOpen(false)
                 }}
-                className={`${getNavButtonClasses('/planos')} relative`}
+                className={`${getNavButtonClasses('/categorias')} relative`}
               >
                 Planos
                 {/* Indicador ativo para mobile */}
-                {isActiveRoute('/planos') && (
+                {isActiveRoute('/categorias') && (
                   <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-8 h-0.5 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full animate-pulse"></div>
                 )}
               </button>

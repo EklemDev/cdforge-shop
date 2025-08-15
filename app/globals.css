@@ -345,6 +345,202 @@ textarea:focus-visible {
   }
 }
 
+/* Otimizações específicas para navegação de categorias */
+.category-navigation {
+  contain: layout style paint;
+  will-change: transform;
+}
+
+.category-indicator {
+  contain: layout style paint;
+  will-change: transform, opacity;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.category-indicator:hover {
+  transform: scale(1.1);
+}
+
+.category-indicator.active {
+  transform: scale(1.2);
+}
+
+/* Otimização: Prevenção de layout shift em navegação */
+.navigation-container {
+  min-height: 60px;
+  contain: layout style paint;
+}
+
+/* Otimização: Botões de navegação responsivos */
+@media (max-width: 640px) {
+  .category-navigation {
+    gap: 8px;
+  }
+  
+  .category-indicator {
+    width: 8px;
+    height: 8px;
+  }
+  
+  .navigation-container {
+    min-height: 50px;
+  }
+}
+
+/* Otimização: Animações suaves para navegação */
+.navigation-transition {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Otimização: Prevenção de travamentos durante navegação */
+.navigation-disabled {
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+/* Otimização: Feedback visual para toque */
+@media (hover: none) and (pointer: coarse) {
+  .category-indicator:active {
+    transform: scale(0.9);
+  }
+  
+  .navigation-button:active {
+    transform: scale(0.95);
+  }
+}
+
+/* Otimizações para o novo design de categorias */
+.category-card {
+  contain: layout style paint;
+  will-change: transform;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.benefit-item {
+  contain: layout style paint;
+  will-change: transform;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.benefit-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.category-button {
+  contain: layout style paint;
+  will-change: transform;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.category-button:hover {
+  transform: scale(1.02);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.category-button:active {
+  transform: scale(0.98);
+}
+
+/* Otimização: Indicadores de navegação */
+.navigation-indicator {
+  contain: layout style paint;
+  will-change: transform, opacity;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.navigation-indicator.active {
+  transform: scale(1.25);
+}
+
+/* Otimização: Botões de navegação */
+.navigation-control {
+  contain: layout style paint;
+  will-change: transform;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.navigation-control:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.navigation-control:active {
+  transform: scale(0.95);
+}
+
+/* Otimização: Prevenção de layout shift */
+.category-container {
+  min-height: 600px;
+  contain: layout style paint;
+}
+
+/* Otimização: Responsividade para mobile */
+@media (max-width: 640px) {
+  .category-card {
+    margin: 0 8px;
+  }
+  
+  .benefit-item {
+    padding: 12px;
+  }
+  
+  .category-button {
+    padding: 12px 24px;
+    font-size: 16px;
+  }
+  
+  .navigation-indicator {
+    width: 8px;
+    height: 8px;
+  }
+  
+  .navigation-control {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+/* Otimização: Performance para dispositivos de baixa capacidade */
+@media (max-width: 480px) {
+  .category-card {
+    will-change: auto;
+  }
+  
+  .benefit-item {
+    will-change: auto;
+  }
+  
+  .category-button {
+    will-change: auto;
+  }
+}
+
+/* Otimização: Animações suaves */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.category-fade-in {
+  animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Otimização: Gradientes suaves */
+.gradient-overlay {
+  background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
 /* Dark mode transitions otimizadas */
 .dark * {
   transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;

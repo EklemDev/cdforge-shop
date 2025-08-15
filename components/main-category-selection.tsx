@@ -9,13 +9,13 @@ import Link from "next/link"
 import FirebaseDataService from "@/lib/firebase-data-service"
 import { MainCategory } from "@/lib/firebase-data-service"
 
-// Mapeamento de ícones Lucide memoizado
-const iconMap = useMemo(() => ({
+// Mapeamento de ícones Lucide estático
+const iconMap = {
   Bot,
   Globe,
   Palette,
   Settings,
-} as const), [])
+} as const
 
 export default function MainCategorySelection() {
   const [categories, setCategories] = useState<MainCategory[]>([])
