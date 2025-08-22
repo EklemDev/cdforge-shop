@@ -1,121 +1,78 @@
 import { useState, useEffect } from 'react'
-import { collection, doc, getDocs, addDoc, updateDoc, deleteDoc, onSnapshot, query, orderBy } from 'firebase/firestore'
-import { db } from '@/lib/firebase'
-
-export interface Contact {
-  id: string
-  name: string
-  email: string
-  phone: string
-  subject: string
-  message: string
-  status: 'new' | 'read' | 'replied' | 'archived'
-  priority: 'low' | 'medium' | 'high'
-  source: 'contact_form' | 'order_form' | 'direct'
-  createdAt: any
-  updatedAt: any
-}
+import FirebaseDataService, { Contact } from '@/lib/firebase-data-service'
 
 export function useContacts() {
   const [contacts, setContacts] = useState<Contact[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
+  const firebaseService = FirebaseDataService.getInstance()
+
+  // Carregar contatos iniciais
   useEffect(() => {
-    const loadContacts = async () => {
-      if (!db) return
+    const unsubscribe = firebaseService.onContactsChange((contactsData) => {
+      setContacts(contactsData)
+      setLoading(false)
+      setError(null)
+    })
 
-      try {
-        const contactsRef = collection(db, 'contacts')
-        const q = query(contactsRef, orderBy('createdAt', 'desc'))
-        
-        const unsubscribe = onSnapshot(q, (snapshot) => {
-          const contactsData: Contact[] = []
-          snapshot.forEach((doc) => {
-            const data = doc.data() as Contact
-            contactsData.push({ ...data, id: doc.id })
-          })
-          setContacts(contactsData)
-          setLoading(false)
-        })
-
-        return unsubscribe
-      } catch (error) {
-        console.error('Erro ao carregar contatos:', error)
-        setLoading(false)
-      }
-    }
-
-    loadContacts()
+    return () => unsubscribe()
   }, [])
 
-  const addContact = async (contact: Omit<Contact, 'id' | 'createdAt' | 'updatedAt'>) => {
-    if (!db) return null
-
+  const addContact = async (contactData: Omit<Contact, 'id' | 'createdAt' | 'updatedAt'>) => {
     try {
-      const newContact = {
-        ...contact,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      }
-      
-      const docRef = await addDoc(collection(db, 'contacts'), newContact)
-      return docRef.id
-    } catch (error) {
-      console.error('Erro ao adicionar contato:', error)
-      return null
+      const newContact = await firebaseService.addContact(contactData)
+      setContacts(prev => [...prev, newContact].sort((a, b) => a.order - b.order))
+      return newContact
+    } catch (err) {
+      setError('Erro ao adicionar contato')
+      throw err
     }
   }
 
-  const updateContact = async (id: string, contact: Partial<Contact>) => {
-    if (!db) return false
-
+  const updateContact = async (contactId: string, updates: Partial<Contact>) => {
     try {
-      const docRef = doc(db, 'contacts', id)
-      await updateDoc(docRef, {
-        ...contact,
-        updatedAt: new Date()
-      })
-      return true
-    } catch (error) {
-      console.error('Erro ao atualizar contato:', error)
-      return false
+      await firebaseService.updateContact(contactId, updates)
+      setContacts(prev => 
+        prev.map(contact => 
+          contact.id === contactId 
+            ? { ...contact, ...updates }
+            : contact
+        ).sort((a, b) => a.order - b.order)
+      )
+    } catch (err) {
+      setError('Erro ao atualizar contato')
+      throw err
     }
   }
 
-  const deleteContact = async (id: string) => {
-    if (!db) return false
-
+  const deleteContact = async (contactId: string) => {
     try {
-      await deleteDoc(doc(db, 'contacts', id))
-      return true
-    } catch (error) {
-      console.error('Erro ao deletar contato:', error)
-      return false
+      await firebaseService.deleteContact(contactId)
+      setContacts(prev => prev.filter(contact => contact.id !== contactId))
+    } catch (err) {
+      setError('Erro ao deletar contato')
+      throw err
     }
   }
 
-  const getContactsByStatus = (status: Contact['status']) => {
-    return contacts.filter(contact => contact.status === status)
-  }
-
-  const getContactsByPriority = (priority: Contact['priority']) => {
-    return contacts.filter(contact => contact.priority === priority)
-  }
-
-  const getNewContacts = () => {
-    return contacts.filter(contact => contact.status === 'new')
+  const toggleContactStatus = async (contactId: string) => {
+    const contact = contacts.find(c => c.id === contactId)
+    if (contact) {
+      await updateContact(contactId, { active: !contact.active })
+    }
   }
 
   return {
     contacts,
     loading,
+    error,
     addContact,
     updateContact,
     deleteContact,
-    getContactsByStatus,
-    getContactsByPriority,
-    getNewContacts
+    toggleContactStatus
   }
 }
+
 
 

@@ -1,20 +1,9 @@
 "use client"
 
 import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { motion, AnimatePresence } from "framer-motion"
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Badge } from "@/components/ui/badge"
-import { Checkbox } from "@/components/ui/checkbox"
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import { 
   Dialog,
   DialogContent,
@@ -24,463 +13,692 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { 
-  User, 
-  Mail, 
-  Phone, 
-  MessageSquare, 
-  Calendar,
-  DollarSign,
+  Rocket,
   CheckCircle,
+  Sparkles,
   ArrowLeft,
-  Send
+  Download,
+  MessageCircle,
+  ChevronLeft,
+  ChevronRight,
+  ArrowRight,
+  Check,
+  Zap,
+  Shield,
+  Target,
+  TrendingUp,
+  Bot,
+  Globe,
+  Palette,
+  Settings
 } from "lucide-react"
 import { MainCategory } from "@/lib/firebase-data-service"
 import FirebaseDataService from "@/lib/firebase-data-service"
+import { useRouter } from "next/navigation"
 
 interface CategoryOrderFormProps {
   category: MainCategory
   onBack: () => void
 }
 
-const budgetOptions = [
-  { value: "500-1000", label: "R$ 500 - R$ 1.000" },
-  { value: "1000-3000", label: "R$ 1.000 - R$ 3.000" },
-  { value: "3000-5000", label: "R$ 3.000 - R$ 5.000" },
-  { value: "5000-10000", label: "R$ 5.000 - R$ 10.000" },
-  { value: "10000+", label: "Acima de R$ 10.000" },
-  { value: "flexible", label: "Orçamento flexível" },
-]
-
-const timelineOptions = [
-  { value: "1-2-weeks", label: "1-2 semanas" },
-  { value: "2-4-weeks", label: "2-4 semanas" },
-  { value: "1-2-months", label: "1-2 meses" },
-  { value: "2-3-months", label: "2-3 meses" },
-  { value: "3+months", label: "3+ meses" },
-  { value: "flexible", label: "Prazo flexível" },
-]
-
-const contactMethods = [
-  { id: "whatsapp", label: "WhatsApp", icon: Phone },
-  { id: "email", label: "E-mail", icon: Mail },
-  { id: "phone", label: "Telefone", icon: Phone },
-  { id: "discord", label: "Discord", icon: MessageSquare },
-]
-
 export default function CategoryOrderForm({ category, onBack }: CategoryOrderFormProps) {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    company: "",
-    budget: "",
-    timeline: "",
-    description: "",
-    features: [] as string[],
-    contactMethods: [] as string[],
-    urgency: "normal",
-    additionalInfo: "",
-  })
-
-  const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false)
+  // Estados para controle do fluxo
+  const [currentStep, setCurrentStep] = useState(1)
+  const [selectedFeatures, setSelectedFeatures] = useState<string[]>([])
+  const [showFinalScreen, setShowFinalScreen] = useState(false)
+  
+  // Estados para submissão
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false)
+  const [downloadState, setDownloadState] = useState<'idle' | 'downloading' | 'completed'>('idle')
+  const [downloadProgress, setDownloadProgress] = useState(0)
+  
+  const router = useRouter()
 
-  const handleFeatureToggle = (feature: string) => {
-    setFormData(prev => ({
-      ...prev,
-      features: prev.features.includes(feature)
-        ? prev.features.filter(f => f !== feature)
-        : [...prev.features, feature]
-    }))
+  const getCategoryColor = () => {
+    switch (category.title.toLowerCase()) {
+      case "bots": return "from-blue-500 to-cyan-500"
+      case "sites": return "from-green-500 to-emerald-500"
+      case "design": return "from-purple-500 to-pink-500"
+      case "assistência": return "from-orange-500 to-red-500"
+      default: return "from-blue-500 to-purple-500"
+    }
   }
 
-  const handleContactMethodToggle = (method: string) => {
-    setFormData(prev => ({
-      ...prev,
-      contactMethods: prev.contactMethods.includes(method)
-        ? prev.contactMethods.filter(m => m !== method)
-        : [...prev.contactMethods, method]
-    }))
+  const getCategoryIcon = () => {
+    switch (category.title.toLowerCase()) {
+      case "bots": return Bot
+      case "sites": return Globe
+      case "design": return Palette
+      case "assistência": return Settings
+      default: return Settings
+    }
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  // Recursos disponíveis por categoria
+  const getCategoryFeatures = () => {
+    const featuresMap = {
+      "bots": [
+        { id: 'automation', name: 'Automação de Mensagens', icon: Zap, description: 'Automatize 80% das tarefas repetitivas' },
+        { id: 'support', name: 'Atendimento 24/7', icon: Shield, description: 'Atendimento técnico especializado' },
+        { id: 'analytics', name: 'Relatórios Detalhados', icon: TrendingUp, description: 'Métricas e insights completos' },
+        { id: 'integration', name: 'Integração com CRM', icon: Target, description: 'Conecte com suas ferramentas' }
+      ],
+      "sites": [
+        { id: 'responsive', name: 'Design Responsivo', icon: Target, description: 'Perfeito em todos os dispositivos' },
+        { id: 'seo', name: 'Otimização SEO', icon: TrendingUp, description: 'Apareça no topo do Google' },
+        { id: 'speed', name: 'Carregamento Rápido', icon: Zap, description: 'Velocidade de carregamento otimizada' },
+        { id: 'security', name: 'Certificado SSL', icon: Shield, description: 'Segurança e proteção total' }
+      ],
+      "design": [
+        { id: 'branding', name: 'Identidade Visual', icon: Target, description: 'Logo e identidade completa' },
+        { id: 'social', name: 'Posts para Redes Sociais', icon: TrendingUp, description: 'Conteúdo para Instagram/Facebook' },
+        { id: 'print', name: 'Material Impresso', icon: Shield, description: 'Cartões, folders e banners' },
+        { id: 'web', name: 'Design Web', icon: Zap, description: 'Interfaces modernas e atrativas' }
+      ],
+      "assistência": [
+        { id: 'strategy', name: 'Estratégia de Marketing', icon: Target, description: 'Planejamento estratégico completo' },
+        { id: 'analytics', name: 'Análise de Dados', icon: TrendingUp, description: 'Métricas e insights detalhados' },
+        { id: 'support', name: 'Suporte Técnico', icon: Shield, description: 'Atendimento especializado' },
+        { id: 'optimization', name: 'Otimização Contínua', icon: Zap, description: 'Melhorias constantes' }
+      ]
+    }
+    
+    return featuresMap[category.title.toLowerCase() as keyof typeof featuresMap] || []
+  }
+
+  const handleFeatureToggle = (featureId: string) => {
+    setSelectedFeatures(prev => 
+      prev.includes(featureId) 
+        ? prev.filter(id => id !== featureId)
+        : [...prev, featureId]
+    )
+  }
+
+  const handleNext = () => {
+    if (currentStep < 3) {
+      setCurrentStep(currentStep + 1)
+    } else {
+      setShowFinalScreen(true)
+    }
+  }
+
+  const handlePrev = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1)
+    }
+  }
+
+  // Função para gerar e baixar o PDF
+  const generateAndDownloadPDF = async () => {
+    try {
+      setDownloadState('downloading')
+      setDownloadProgress(0)
+      
+      // Simular progresso de download
+      const progressInterval = setInterval(() => {
+        setDownloadProgress(prev => {
+          if (prev >= 90) {
+            clearInterval(progressInterval)
+            return 90
+          }
+          return prev + 10
+        })
+      }, 100)
+
+      // Importar jsPDF dinamicamente
+      const { default: jsPDF } = await import('jspdf')
+      
+      const doc = new jsPDF()
+      doc.setFont("helvetica")
+      doc.setFontSize(20)
+      
+      // Título principal
+      doc.setTextColor(59, 130, 246)
+      doc.text("COMPROVANTE DE SOLICITAÇÃO", 105, 30, { align: "center" })
+      
+      // Linha separadora
+      doc.setDrawColor(59, 130, 246)
+      doc.setLineWidth(0.5)
+      doc.line(20, 40, 190, 40)
+      
+      // Informações do comprovante
+      doc.setFontSize(12)
+      doc.setTextColor(0, 0, 0)
+      
+      const currentDate = new Date()
+      const formattedDate = currentDate.toLocaleDateString('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      })
+      
+      const data = [
+        { label: "Data e Hora:", value: formattedDate },
+        { label: "Categoria Solicitada:", value: category.title },
+        { label: "Descrição:", value: category.description },
+      ]
+
+      // Adicionar recursos selecionados
+      if (selectedFeatures.length > 0) {
+        const features = getCategoryFeatures()
+        const selectedFeatureNames = selectedFeatures.map(id => 
+          features.find(f => f.id === id)?.name
+        ).filter(Boolean)
+        data.push({ label: "Recursos:", value: selectedFeatureNames.join(', ') })
+      }
+      
+      let yPosition = 60
+      data.forEach((item) => {
+        doc.setFont("helvetica", "bold")
+        doc.text(item.label, 20, yPosition)
+        
+        doc.setFont("helvetica", "normal")
+        const valueX = 20 + doc.getTextWidth(item.label) + 5
+        doc.text(item.value, valueX, yPosition)
+        
+        yPosition += 15
+      })
+      
+      // Status da solicitação
+      yPosition += 10
+      doc.setFont("helvetica", "bold")
+      doc.setTextColor(59, 130, 246)
+      doc.text("Status da Solicitação", 20, yPosition)
+      
+      doc.setFont("helvetica", "normal")
+      doc.setTextColor(0, 0, 0)
+      yPosition += 10
+      doc.text("✅ Solicitação recebida com sucesso", 20, yPosition)
+      yPosition += 8
+      doc.text("⏳ Aguardando análise da equipe", 20, yPosition)
+      yPosition += 8
+      doc.text("📞 Entraremos em contato em breve", 20, yPosition)
+      
+      // Rodapé
+      yPosition += 20
+      doc.setFontSize(10)
+      doc.setTextColor(107, 114, 128)
+      doc.text("CodeForge - Transformando ideias em realidade", 105, yPosition, { align: "center" })
+      
+      // Gerar nome do arquivo
+      const fileName = `comprovante_${category.title.toLowerCase()}_${currentDate.toISOString().split('T')[0]}.pdf`
+      
+      setDownloadProgress(100)
+      await new Promise(resolve => setTimeout(resolve, 500))
+      
+      doc.save(fileName)
+      await new Promise(resolve => setTimeout(resolve, 800))
+      
+      setDownloadState('completed')
+      
+    } catch (error) {
+      console.error('Erro ao gerar PDF:', error)
+      alert('Erro ao gerar o comprovante. Tente novamente.')
+      setDownloadState('idle')
+    }
+  }
+
+  const handleSubmit = async () => {
     setIsSubmitting(true)
 
     try {
       const firebaseService = FirebaseDataService.getInstance()
       
+      // Criar dados completos do pedido
       const orderData = {
-        customerName: formData.name,
-        customerEmail: formData.email,
-        customerPhone: formData.phone,
+        customerName: "Cliente",
+        customerEmail: "",
+        customerPhone: "",
         projectType: category.title,
         category: category.title,
-        description: formData.description,
-        budget: formData.budget,
-        timeline: formData.timeline,
+        description: category.description,
+        features: selectedFeatures,
+        budget: "",
+        timeline: "",
         status: 'pending' as const,
         assignedTo: '',
-        priority: formData.urgency as 'low' | 'medium' | 'high',
-        notes: `Empresa/Projeto: ${formData.company}\nFuncionalidades: ${formData.features.join(', ')}\nMétodos de contato: ${formData.contactMethods.join(', ')}\nInformações adicionais: ${formData.additionalInfo}`,
+        priority: 'medium' as 'low' | 'medium' | 'high',
+        notes: `Solicitação com recursos: ${selectedFeatures.join(', ') || 'Nenhum'}`,
       }
 
       await firebaseService.addOrder(orderData)
+      await generateAndDownloadPDF()
       
       setIsSubmitting(false)
       setIsSuccessDialogOpen(true)
     } catch (error) {
       console.error('Erro ao enviar pedido:', error)
       setIsSubmitting(false)
+      setDownloadState('idle')
       alert('Erro ao enviar pedido. Tente novamente.')
     }
   }
 
-  const getCategoryFeatures = () => {
-    switch (category.title.toLowerCase()) {
-      case "bots":
-        return [
-          "Automação de vendas",
-          "Sistema de pagamentos",
-          "Gestão de clientes",
-          "Relatórios e analytics",
-          "Integração com APIs",
-          "Chat personalizado",
-          "Sistema de tickets",
-          "Backup automático",
-          "Painel administrativo",
-          "Suporte 24/7"
-        ]
-      case "sites":
-        return [
-          "Design responsivo",
-          "E-commerce completo",
-          "Sistema de pagamentos",
-          "Painel administrativo",
-          "SEO otimizado",
-          "Blog integrado",
-          "Formulários de contato",
-          "Analytics integrado",
-          "Backup automático",
-          "Hospedagem incluída"
-        ]
-      case "design":
-        return [
-          "Logo personalizado",
-          "Identidade visual completa",
-          "Manual da marca",
-          "Design para redes sociais",
-          "Material impresso",
-          "UI/UX design",
-          "Animações",
-          "Templates reutilizáveis",
-          "Arquivos editáveis",
-          "Suporte pós-entrega"
-        ]
-      case "assistência":
-        return [
-          "Análise de Instagram",
-          "Consultoria estratégica",
-          "Suporte técnico",
-          "Treinamento personalizado",
-          "Relatórios mensais",
-          "Otimização de processos",
-          "Automação de tarefas",
-          "Monitoramento 24/7",
-          "Backup e segurança",
-          "Atualizações regulares"
-        ]
+  const handleSuccessDialogClose = () => {
+    setIsSuccessDialogOpen(false)
+    router.push('/categorias')
+  }
+
+  const handleCompletedClick = () => {
+    router.push('/categorias')
+  }
+
+  // Renderizar etapa específica
+  const renderStep = () => {
+    switch (currentStep) {
+      case 1:
+        return renderStep1()
+      case 2:
+        return renderStep2()
+      case 3:
+        return renderStep3()
       default:
-        return []
+        return renderStep1()
     }
   }
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <Button
-            variant="ghost"
-            onClick={onBack}
-            className="mb-4 flex items-center gap-2 hover:bg-white dark:hover:bg-gray-800"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Voltar para categorias
-          </Button>
-          
-          <div className="text-center">
-            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-4">
-              Solicitar {category.title}
-            </h1>
-            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-              Preencha o formulário abaixo e nossa equipe entrará em contato para discutir seu projeto
-            </p>
+  // Etapa 1: Informações da categoria
+  const renderStep1 = () => {
+    const IconComponent = getCategoryIcon()
+    
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -20 }}
+        className="max-w-4xl mx-auto"
+      >
+        <Card className="shadow-2xl border-0 overflow-hidden">
+          <CardContent className="p-8">
+            {/* Header */}
+            <div className="text-center mb-8">
+              <div className={`w-20 h-20 bg-gradient-to-r ${getCategoryColor()} rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl`}>
+                <IconComponent className="w-10 h-10 text-white" />
+              </div>
+              <h1 className="text-2xl font-bold text-gray-900 mb-4">
+                {category.title}
+              </h1>
+              <p className="text-lg text-gray-600">
+                {category.description}
+              </p>
+            </div>
+
+            {/* Card da Categoria */}
+            <Card className="mb-8 border-2 border-blue-200 bg-gradient-to-r from-blue-50 to-purple-50">
+              <CardContent className="p-6">
+                <div className="text-center">
+                  <h3 className="text-xl font-bold text-gray-900 mb-4">
+                    O que você receberá:
+                  </h3>
+                  <div className="space-y-3 text-left">
+                    <div className="flex items-center gap-3">
+                      <Check className="w-5 h-5 text-green-500" />
+                      <span className="text-gray-700">Solução personalizada para seu negócio</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Check className="w-5 h-5 text-green-500" />
+                      <span className="text-gray-700">Suporte técnico especializado</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Check className="w-5 h-5 text-green-500" />
+                      <span className="text-gray-700">Entrega dentro do prazo acordado</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Check className="w-5 h-5 text-green-500" />
+                      <span className="text-gray-700">Garantia de qualidade</span>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Botões de Navegação */}
+            <div className="flex justify-between">
+              <Button
+                variant="outline"
+                onClick={onBack}
+                className="px-6 py-3"
+              >
+                <ChevronLeft className="w-4 h-4 mr-2" />
+                Voltar
+              </Button>
+              <Button
+                onClick={handleNext}
+                className={`px-6 py-3 bg-gradient-to-r ${getCategoryColor()} text-white`}
+              >
+                Continuar
+                <ChevronRight className="w-4 h-4 ml-2" />
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+    )
+  }
+
+  // Etapa 2: Seleção de recursos
+  const renderStep2 = () => {
+    const IconComponent = getCategoryIcon()
+    const features = getCategoryFeatures()
+    
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -20 }}
+        className="max-w-4xl mx-auto"
+      >
+        <Card className="shadow-2xl border-0 overflow-hidden">
+          <CardContent className="p-8">
+            {/* Header */}
+            <div className="text-center mb-8">
+              <div className={`w-20 h-20 bg-gradient-to-r ${getCategoryColor()} rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl`}>
+                <IconComponent className="w-10 h-10 text-white" />
+              </div>
+              <h1 className="text-2xl font-bold text-gray-900 mb-4">
+                Personalize seu {category.title}
+              </h1>
+              <p className="text-lg text-gray-600">
+                Selecione os recursos que deseja incluir
+              </p>
+            </div>
+
+            {/* Grid de Recursos */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+              {features.map((feature) => {
+                const FeatureIcon = feature.icon
+                const isSelected = selectedFeatures.includes(feature.id)
+                
+                return (
+                  <Card
+                    key={feature.id}
+                    className={`relative overflow-hidden border-2 cursor-pointer transition-all duration-300 hover:shadow-lg ${
+                      isSelected 
+                        ? 'border-blue-500 bg-blue-50' 
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                    onClick={() => handleFeatureToggle(feature.id)}
+                  >
+                    <CardContent className="p-4">
+                      <div className="flex items-start gap-3">
+                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                          isSelected ? 'bg-blue-100' : 'bg-gray-100'
+                        }`}>
+                          <FeatureIcon className={`w-5 h-5 ${isSelected ? 'text-blue-600' : 'text-gray-600'}`} />
+                        </div>
+                        <div className="flex-1">
+                          <span className={`font-medium ${isSelected ? 'text-blue-900' : 'text-gray-900'}`}>
+                            {feature.name}
+                          </span>
+                          <p className="text-sm text-gray-600 mt-1">
+                            {feature.description}
+                          </p>
+                        </div>
+                        {isSelected && (
+                          <Check className="w-5 h-5 text-blue-500 flex-shrink-0" />
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )
+              })}
+            </div>
+
+            {/* Botões de Navegação */}
+            <div className="flex justify-between">
+              <Button
+                variant="outline"
+                onClick={handlePrev}
+                className="px-6 py-3"
+              >
+                <ChevronLeft className="w-4 h-4 mr-2" />
+                Voltar
+              </Button>
+              <Button
+                onClick={handleNext}
+                className={`px-6 py-3 bg-gradient-to-r ${getCategoryColor()} text-white`}
+              >
+                Continuar
+                <ChevronRight className="w-4 h-4 ml-2" />
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+    )
+  }
+
+  // Etapa 3: Resumo e confirmação
+  const renderStep3 = () => {
+    const IconComponent = getCategoryIcon()
+    const features = getCategoryFeatures()
+    const selectedFeatureNames = selectedFeatures.map(id => 
+      features.find(f => f.id === id)?.name
+    ).filter(Boolean)
+    
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -20 }}
+        className="max-w-4xl mx-auto"
+      >
+        <Card className="shadow-2xl border-0 overflow-hidden">
+          <CardContent className="p-8">
+            {/* Header */}
+            <div className="text-center mb-8">
+              <div className={`w-20 h-20 bg-gradient-to-r ${getCategoryColor()} rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl`}>
+                <IconComponent className="w-10 h-10 text-white" />
+              </div>
+              <h1 className="text-2xl font-bold text-gray-900 mb-4">
+                Resumo da Solicitação
+              </h1>
+              <p className="text-lg text-gray-600">
+                Confirme os detalhes antes de prosseguir
+              </p>
+            </div>
+
+            {/* Resumo */}
+            <div className="bg-gray-50 rounded-xl p-6 mb-8">
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <span className="font-medium text-gray-700">Categoria:</span>
+                  <span className="text-gray-900">{category.title}</span>
+                </div>
+                
+                <div className="flex justify-between items-center">
+                  <span className="font-medium text-gray-700">Descrição:</span>
+                  <span className="text-gray-900">{category.description}</span>
+                </div>
+                
+                {selectedFeatureNames.length > 0 && (
+                  <div>
+                    <span className="font-medium text-gray-700">Recursos selecionados:</span>
+                    <div className="mt-2 space-y-1">
+                      {selectedFeatureNames.map((name, index) => (
+                        <div key={index} className="flex items-center gap-2 text-gray-900">
+                          <Check className="w-4 h-4 text-green-500" />
+                          {name}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Botões de Navegação */}
+            <div className="flex justify-between">
+              <Button
+                variant="outline"
+                onClick={handlePrev}
+                className="px-6 py-3"
+              >
+                <ChevronLeft className="w-4 h-4 mr-2" />
+                Voltar
+              </Button>
+              <Button
+                onClick={handleNext}
+                className={`px-6 py-3 bg-gradient-to-r ${getCategoryColor()} text-white`}
+              >
+                Confirmar e Continuar
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+    )
+  }
+
+  // Tela final simplificada
+  if (showFinalScreen) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
+        <div className="container mx-auto px-4 py-8">
+          <div className="max-w-2xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+            >
+              <Card className="shadow-2xl border-0 overflow-hidden">
+                <CardContent className="p-12">
+                  {/* Ícone e Título */}
+                  <div className="text-center mb-8">
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
+                      className={`w-24 h-24 bg-gradient-to-r ${getCategoryColor()} rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl`}
+                    >
+                      <Rocket className="w-12 h-12 text-white" />
+                    </motion.div>
+                    
+                    <motion.h1
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.3 }}
+                      className="text-4xl font-bold text-gray-900 mb-4"
+                    >
+                      Tudo certo até aqui! 🚀
+                    </motion.h1>
+                    
+                    <motion.p
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.4 }}
+                      className="text-xl text-gray-600 mb-8"
+                    >
+                      Envie sua solicitação e baixe o comprovante.
+                    </motion.p>
+                  </div>
+
+                  {/* Mensagem Adicional */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 }}
+                    className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-2xl border border-blue-100 mb-8"
+                  >
+                    <div className="flex items-start gap-3">
+                      <MessageCircle className="w-6 h-6 text-blue-500 mt-1 flex-shrink-0" />
+                      <div>
+                        <p className="text-gray-700 text-lg leading-relaxed">
+                          Entre em contato e envie seu comprovante via WhatsApp para garantir uma resposta mais rápida e segura.
+                        </p>
+                      </div>
+                    </div>
+                  </motion.div>
+
+                  {/* Botão Principal */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.6 }}
+                    className="text-center"
+                  >
+                    <Button
+                      onClick={handleSubmit}
+                      disabled={isSubmitting || downloadState === 'downloading'}
+                      className={`w-full py-6 text-xl bg-gradient-to-r ${getCategoryColor()} text-white hover:shadow-2xl transition-all duration-300 rounded-2xl font-bold text-lg`}
+                      size="lg"
+                    >
+                      {isSubmitting ? (
+                        <div className="flex items-center gap-3">
+                          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+                          Enviando solicitação...
+                        </div>
+                      ) : downloadState === 'downloading' ? (
+                        <div className="flex items-center gap-3">
+                          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+                          Baixando Comprovante...
+                          <span className="text-sm">({downloadProgress}%)</span>
+                        </div>
+                      ) : downloadState === 'completed' ? (
+                        <div 
+                          className="flex items-center gap-3 cursor-pointer hover:scale-105 transition-all duration-200"
+                          onClick={handleCompletedClick}
+                          title="Clique para voltar às categorias"
+                        >
+                          <CheckCircle className="w-6 h-6" />
+                          Concluído!
+                          <Sparkles className="w-5 h-5" />
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-3">
+                          <Download className="w-6 h-6" />
+                          Enviar Solicitação e Baixar Comprovante
+                          <Sparkles className="w-5 h-5" />
+                        </div>
+                      )}
+                    </Button>
+                  </motion.div>
+                </CardContent>
+              </Card>
+            </motion.div>
           </div>
         </div>
+      </div>
+    )
+  }
 
-        <form onSubmit={handleSubmit} className="max-w-4xl mx-auto space-y-8">
-          {/* Informações Pessoais */}
-          <Card className="shadow-lg border-0">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <User className="w-5 h-5" />
-                Informações Pessoais
-              </CardTitle>
-              <CardDescription>
-                Como podemos entrar em contato com você?
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="name">Nome completo *</Label>
-                  <Input
-                    id="name"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    placeholder="Seu nome completo"
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="email">E-mail *</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    placeholder="seu@email.com"
-                    required
-                  />
-                </div>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="phone">Telefone/WhatsApp</Label>
-                  <Input
-                    id="phone"
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    placeholder="(11) 99999-9999"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="company">Empresa/Projeto</Label>
-                  <Input
-                    id="company"
-                    value={formData.company}
-                    onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                    placeholder="Nome da sua empresa ou projeto"
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Detalhes do Projeto */}
-          <Card className="shadow-lg border-0">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <MessageSquare className="w-5 h-5" />
-                Detalhes do Projeto
-              </CardTitle>
-              <CardDescription>
-                Conte-nos mais sobre o que você precisa
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div>
-                <Label htmlFor="description">Descrição do projeto *</Label>
-                <Textarea
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder="Descreva detalhadamente o que você precisa. Quanto mais informações, melhor poderemos atendê-lo."
-                  rows={4}
-                  required
-                />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="budget">Orçamento</Label>
-                  <Select value={formData.budget} onValueChange={(value) => setFormData({ ...formData, budget: value })}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione seu orçamento" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {budgetOptions.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label htmlFor="timeline">Prazo desejado</Label>
-                  <Select value={formData.timeline} onValueChange={(value) => setFormData({ ...formData, timeline: value })}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione o prazo" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {timelineOptions.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div>
-                <Label>Urgência do projeto</Label>
-                <div className="flex gap-4 mt-2">
-                  {[
-                    { value: "low", label: "Baixa", color: "bg-green-100 text-green-800" },
-                    { value: "normal", label: "Normal", color: "bg-blue-100 text-blue-800" },
-                    { value: "high", label: "Alta", color: "bg-orange-100 text-orange-800" },
-                    { value: "urgent", label: "Urgente", color: "bg-red-100 text-red-800" },
-                  ].map((urgency) => (
-                    <button
-                      key={urgency.value}
-                      type="button"
-                      onClick={() => setFormData({ ...formData, urgency: urgency.value })}
-                      className={`px-4 py-2 rounded-lg border transition-all ${
-                        formData.urgency === urgency.value
-                          ? urgency.color + " border-current"
-                          : "bg-white border-gray-200 hover:bg-gray-50"
-                      }`}
-                    >
-                      {urgency.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Funcionalidades */}
-          <Card className="shadow-lg border-0">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <CheckCircle className="w-5 h-5" />
-                Funcionalidades Desejadas
-              </CardTitle>
-              <CardDescription>
-                Selecione as funcionalidades que você gostaria de incluir
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {getCategoryFeatures().map((feature) => (
-                  <div key={feature} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={feature}
-                      checked={formData.features.includes(feature)}
-                      onCheckedChange={() => handleFeatureToggle(feature)}
-                    />
-                    <Label htmlFor={feature} className="text-sm cursor-pointer">
-                      {feature}
-                    </Label>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Preferências de Contato */}
-          <Card className="shadow-lg border-0">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Phone className="w-5 h-5" />
-                Preferências de Contato
-              </CardTitle>
-              <CardDescription>
-                Como você prefere que entremos em contato?
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                {contactMethods.map((method) => {
-                  const Icon = method.icon
-                  return (
-                    <div key={method.id} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={method.id}
-                        checked={formData.contactMethods.includes(method.id)}
-                        onCheckedChange={() => handleContactMethodToggle(method.id)}
-                      />
-                      <Label htmlFor={method.id} className="text-sm cursor-pointer flex items-center gap-1">
-                        <Icon className="w-4 h-4" />
-                        {method.label}
-                      </Label>
-                    </div>
-                  )
-                })}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Informações Adicionais */}
-          <Card className="shadow-lg border-0">
-            <CardHeader>
-              <CardTitle>Informações Adicionais</CardTitle>
-              <CardDescription>
-                Alguma informação extra que gostaria de compartilhar?
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Textarea
-                value={formData.additionalInfo}
-                onChange={(e) => setFormData({ ...formData, additionalInfo: e.target.value })}
-                placeholder="Links de referência, exemplos, requisitos específicos, etc."
-                rows={3}
-              />
-            </CardContent>
-          </Card>
-
-          {/* Botão de Envio */}
-          <div className="text-center">
-            <Button
-              type="submit"
-              size="lg"
-              disabled={isSubmitting}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 text-lg font-semibold"
-            >
-              {isSubmitting ? (
-                <div className="flex items-center gap-2">
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                  Enviando...
-                </div>
-              ) : (
-                <div className="flex items-center gap-2">
-                  <Send className="w-5 h-5" />
-                  Enviar Solicitação
-                </div>
-              )}
-            </Button>
-          </div>
-        </form>
+  // Renderizar etapas normais
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
+      <div className="container mx-auto px-4 py-8">
+        <AnimatePresence mode="wait">
+          {renderStep()}
+        </AnimatePresence>
       </div>
 
       {/* Dialog de Sucesso */}
       <Dialog open={isSuccessDialogOpen} onOpenChange={setIsSuccessDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-green-600">
-              <CheckCircle className="w-5 h-5" />
-              Solicitação Enviada!
+            <DialogTitle className="flex items-center gap-2 text-green-600 text-xl">
+              <CheckCircle className="w-6 h-6" />
+              Solicitação Enviada com Sucesso! 🎉
             </DialogTitle>
-            <DialogDescription>
-              Sua solicitação foi enviada com sucesso. Nossa equipe entrará em contato em até 24 horas.
+            <DialogDescription className="text-base leading-relaxed">
+              Sua solicitação foi enviada com sucesso! Entre em contato via WhatsApp e envie seu comprovante para uma resposta mais rápida.
             </DialogDescription>
           </DialogHeader>
+          <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+            <h4 className="font-semibold text-green-800 mb-2">Próximos passos:</h4>
+            <ul className="text-sm text-green-700 space-y-1">
+              <li>• Baixe o comprovante (já feito)</li>
+              <li>• Entre em contato via WhatsApp</li>
+              <li>• Envie o comprovante</li>
+              <li>• Receba resposta em até 24h</li>
+            </ul>
+          </div>
           <DialogFooter>
-            <Button onClick={() => setIsSuccessDialogOpen(false)}>
-              Fechar
+            <Button onClick={handleSuccessDialogClose} className="w-full">
+              Voltar às Categorias
             </Button>
           </DialogFooter>
         </DialogContent>

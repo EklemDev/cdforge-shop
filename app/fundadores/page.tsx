@@ -183,9 +183,8 @@ export default function FundadoresPage() {
                   </Button>
                   <Button 
                     asChild 
-                    variant="outline" 
                     size="lg"
-                    className="border-white text-white hover:bg-white hover:text-blue-600 px-6 py-3 text-base rounded-xl transition-all duration-300 hover:scale-105"
+                    className="bg-white/20 backdrop-blur-sm border border-white/30 text-white hover:bg-white hover:text-blue-600 px-6 py-3 text-base rounded-xl transition-all duration-300 hover:scale-105"
                   >
                     <a href="/categorias" className="flex items-center">
                       <Zap className="w-4 h-4 mr-2" />

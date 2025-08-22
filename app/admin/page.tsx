@@ -19,12 +19,14 @@ import {
   Trash2,
   Eye,
   EyeOff,
-  MessageSquare
+  MessageSquare,
+  Phone
 } from "lucide-react"
 import CategoryManager from "@/components/category-manager"
 import FounderManager from "@/components/founder-manager"
 import OrdersManager from "@/components/orders-manager"
 import { PlanNotifications } from "@/components/plan-notifications"
+import ContactsManager from "@/components/contacts-manager"
 
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState("orders")
@@ -44,7 +46,7 @@ export default function AdminPage() {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-5 mb-8">
+          <TabsList className="grid w-full grid-cols-6 mb-8">
             <TabsTrigger value="orders" className="flex items-center gap-2">
               <MessageSquare className="w-4 h-4" />
               Pedidos
@@ -60,6 +62,10 @@ export default function AdminPage() {
             <TabsTrigger value="founders" className="flex items-center gap-2">
               <Users className="w-4 h-4" />
               Fundadores
+            </TabsTrigger>
+            <TabsTrigger value="contacts" className="flex items-center gap-2">
+              <Phone className="w-4 h-4" />
+              Contatos
             </TabsTrigger>
             <TabsTrigger value="settings" className="flex items-center gap-2">
               <Settings className="w-4 h-4" />
@@ -81,6 +87,10 @@ export default function AdminPage() {
 
           <TabsContent value="founders" className="space-y-6">
             <FounderManager />
+          </TabsContent>
+
+          <TabsContent value="contacts" className="space-y-6">
+            <ContactsManager />
           </TabsContent>
 
           <TabsContent value="settings" className="space-y-6">

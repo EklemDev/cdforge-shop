@@ -58,7 +58,7 @@ const faqItems = [
   {
     question: "Quanto tempo leva para desenvolver um bot?",
     answer:
-      "O tempo varia conforme a complexidade. Bots simples ficam prontos em 3-7 dias, enquanto bots mais complexos podem levar de 1-4 semanas.",
+      "O tempo varia conforme a complexidade. Bots simples ficam prontos em 1-3 dias, enquanto bots mais complexos podem levar de 1-4 semanas.",
   },
   {
     question: "Vocês oferecem suporte após a entrega?",
@@ -153,7 +153,7 @@ export default function AjudaPage() {
                     size="lg"
                     className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-3 text-lg font-semibold"
                   >
-                    <Link href="/ajuda/seja-agente">🚀 Candidatar-se Agora</Link>
+                    <Link href="/ajuda/seja-agente">Candidatar-se Agora</Link>
                   </Button>
                   <Button
                     asChild

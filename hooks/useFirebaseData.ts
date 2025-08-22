@@ -27,33 +27,25 @@ export function useSiteConfig() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    console.log('🔄 useSiteConfig: Configurando listener...')
     const unsubscribe = firebaseService.onSiteConfigChange((newConfig) => {
-      console.log('🔧 SiteConfig atualizado:', newConfig)
-      console.log('🔧 Config anterior:', config)
       setConfig(newConfig)
       setLoading(false)
       setError(null)
     })
 
-    return () => {
-      console.log('🔄 useSiteConfig: Removendo listener...')
-      unsubscribe()
-    }
+    return () => unsubscribe()
   }, [])
 
   const updateConfig = async (updates: Partial<SiteConfig>) => {
     try {
-      console.log('🔄 useSiteConfig: updateConfig chamado com:', updates)
       setError(null)
       const success = await firebaseService.updateSiteConfig(updates)
-      console.log('🔄 useSiteConfig: updateSiteConfig retornou:', success)
       if (!success) {
         setError('Erro ao atualizar configuração')
       }
       return success
     } catch (err) {
-      console.error('❌ useSiteConfig: Erro ao atualizar:', err)
+      console.error('Erro ao atualizar configuração:', err)
       setError('Erro ao atualizar configuração')
       return false
     }

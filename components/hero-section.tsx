@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
 import Link from "next/link"
+import { CodeForgeLogoEnhanced } from "./codeforge-logo-enhanced"
 
 export default function HeroSection() {
   return (
@@ -21,13 +22,7 @@ export default function HeroSection() {
             <div className="relative mr-6">
               <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500 rounded-full blur-lg opacity-60 animate-pulse group-hover:opacity-80 transition-opacity duration-500"></div>
               <div className="relative bg-gradient-to-br from-white to-gray-100 dark:from-gray-800 dark:to-gray-900 p-4 rounded-full shadow-2xl border-2 border-blue-500/30 dark:border-blue-400/40 group-hover:scale-110 group-hover:rotate-12 transition-all duration-700 ease-out">
-                <Image
-                  src="/logo.png"
-                  alt="CodeForge Logo"
-                  width={64}
-                  height={64}
-                  className="w-16 h-16 drop-shadow-2xl filter brightness-110 contrast-110 group-hover:brightness-125 group-hover:contrast-125 transition-all duration-500"
-                />
+                <CodeForgeLogoEnhanced size={64} />
               </div>
               {/* Efeito de Brilho Rotativo na Logo */}
               <div
@@ -89,7 +84,7 @@ export default function HeroSection() {
               size="lg"
               className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-10 py-4 text-lg rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-2xl shadow-lg font-semibold"
             >
-              <Link href="#categories">✨ Escolher Solução</Link>
+              <Link href="#categories">Escolher Solução</Link>
             </Button>
 
             <Button
@@ -99,7 +94,7 @@ export default function HeroSection() {
               className="border-2 border-blue-500 dark:border-blue-400 text-blue-500 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 px-10 py-4 text-lg rounded-xl transition-all duration-300 hover:scale-105 bg-transparent font-semibold"
             >
               <a href="https://discord.gg/jp2BzA4H" target="_blank" rel="noopener noreferrer">
-                💬 Falar no Discord
+                Falar no Discord
               </a>
             </Button>
           </div>

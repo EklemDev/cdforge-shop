@@ -12,17 +12,14 @@ export default function CategoryTest() {
   useEffect(() => {
     const firebaseService = FirebaseDataService.getInstance()
     
-    console.log('🔍 CategoryTest - Iniciando carregamento...')
-    
     // Carregar dados diretamente
     const loadData = async () => {
       try {
         const data = await firebaseService.getMainCategories()
-        console.log('🔍 CategoryTest - Dados carregados:', data)
         setCategories(data)
         setLoading(false)
       } catch (err) {
-        console.error('🔍 CategoryTest - Erro:', err)
+        console.error('Erro ao carregar categorias:', err)
         setError('Erro ao carregar')
         setLoading(false)
       }

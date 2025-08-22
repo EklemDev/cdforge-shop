@@ -6,21 +6,29 @@ import FirebaseDataService from "@/lib/firebase-data-service"
 export interface Plan {
   id: string
   name: string
+  description: string
+  price: number
+  currency: string
+  originalPrice?: number
+  features: string[]
+  limitations: string[]
+  type: 'basic' | 'pro' | 'enterprise'
+  category: string
+  popular: boolean
+  active: boolean
+  order: number
+  testDays: number
   contacts: {
     melke: string
     zanesco: string
     pedro: string
   }
-  testDays: number
-  price: number
   promotion: {
     active: boolean
     type: 'percentage' | 'fixed'
     value: number
     description: string
   }
-  active: boolean
-  order: number
   createdAt: any
   updatedAt: any
 }

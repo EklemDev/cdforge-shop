@@ -67,10 +67,18 @@ export default function SimpleCategoryDisplay() {
 
     if (loading) {
       return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
-          <div className="text-center">
-            <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-gray-600">Carregando categorias...</p>
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-purple-900 to-blue-900">
+          {/* Geometric Background Elements */}
+          <div className="absolute inset-0 overflow-hidden">
+            <div className="absolute top-20 left-10 w-32 h-32 bg-blue-500/10 rounded-full blur-xl animate-pulse"></div>
+            <div className="absolute top-40 right-20 w-24 h-24 bg-purple-500/15 rounded-lg rotate-45 blur-lg animate-bounce"></div>
+            <div className="absolute bottom-20 left-1/4 w-40 h-40 bg-cyan-500/8 rounded-full blur-2xl animate-pulse"></div>
+            <div className="absolute top-1/2 right-10 w-16 h-16 bg-blue-500/20 rounded-lg rotate-12 blur-md animate-spin"></div>
+          </div>
+          
+          <div className="text-center relative z-10">
+            <div className="w-16 h-16 border-4 border-blue-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-white/80">Carregando categorias...</p>
           </div>
         </div>
       )

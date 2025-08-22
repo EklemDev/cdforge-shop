@@ -1,104 +1,77 @@
 "use client"
 
-import { useState } from "react"
-import Header from "@/components/header"
-import Footer from "@/components/footer"
-import DynamicOrderForm from "@/components/dynamic-order-form"
-import { Button } from "@/components/ui/button"
-import { ArrowLeft } from "lucide-react"
-import { MainCategory } from "@/lib/firebase-data-service"
+import { useState, useEffect } from "react"
+import { motion } from "framer-motion"
+import CategoryOrderForm from "@/components/category-order-form"
+import NavigationBar from "@/components/navigation-bar"
+import FooterComponent from "@/components/footer-component"
+import LoadingScreen from "@/components/loading-screen"
+import { categories } from "@/lib/categories-data"
 
 export default function BotsPage() {
-  const [showForm, setShowForm] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const botsCategory = categories.find(cat => cat.id === 'bots')
 
-  const botCategory: MainCategory = {
-    id: "bots",
-    title: "BOTS",
-    description: "Automação inteligente para Discord, WhatsApp, Instagram e Web Scraping",
-    icon: "Bot",
-    href: "/bots",
-    color: "#3B82F6",
-    bgColor: "bg-blue-500",
-    hoverColor: "hover:bg-blue-600",
-    active: true,
-    order: 1,
-    createdAt: new Date(),
-    updatedAt: new Date(),
+  useEffect(() => {
+    // Simular loading
+    setTimeout(() => setIsLoading(false), 1000)
+  }, [])
+
+  if (isLoading) {
+    return <LoadingScreen />
+  }
+
+  if (!botsCategory) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 via-blue-800 to-blue-950 text-white">
+        <p className="text-xl">Categoria de Bots não encontrada.</p>
+      </div>
+    )
+  }
+
+  // Converter Category para MainCategory (formato esperado pelo CategoryOrderForm)
+  const mainCategory = {
+    id: botsCategory.id,
+    title: botsCategory.title,
+    description: botsCategory.description,
+    icon: botsCategory.icon,
+    services: botsCategory.services
   }
 
   const handleBack = () => {
-    if (showForm) {
-      setShowForm(false)
-    } else {
-      window.history.back()
-    }
-  }
-
-  if (showForm) {
-    return <DynamicOrderForm category={botCategory} onBack={handleBack} />
+    // Voltar para a página de categorias
+    window.location.href = '/categorias'
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      <Header />
-      <main className="pt-24 pb-16">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <div className="flex items-center justify-start mb-4">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleBack}
-                className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 transition-colors"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                Sair
-              </Button>
-            </div>
-            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Nossos Bots</h1>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-8">
-              Automatize seus processos com bots inteligentes e personalizados para diferentes plataformas
-            </p>
-            
-            <Button
-              size="lg"
-              onClick={() => setShowForm(true)}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg font-semibold"
-            >
-              🚀 Solicitar Orçamento de Bot
-            </Button>
-          </div>
-
-          <div className="max-w-4xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-lg">
-                <h3 className="text-xl font-semibold text-blue-900 mb-4">🤖 Bots Disponíveis</h3>
-                <ul className="space-y-2 text-blue-800">
-                  <li>• Bot de Vendas para Discord</li>
-                  <li>• Bot de Moderação</li>
-                  <li>• Bot de Música</li>
-                  <li>• Bot de Entretenimento</li>
-                  <li>• Bot de Automação</li>
-                  <li>• Bot de Suporte</li>
-                </ul>
-              </div>
-              
-              <div className="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-lg">
-                <h3 className="text-xl font-semibold text-green-900 mb-4">📱 Plataformas</h3>
-                <ul className="space-y-2 text-green-800">
-                  <li>• Discord</li>
-                  <li>• WhatsApp Business</li>
-                  <li>• Instagram</li>
-                  <li>• Telegram</li>
-                  <li>• Web Scraping</li>
-                  <li>• APIs Personalizadas</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-blue-950 relative overflow-hidden">
+      {/* Geometric Background Elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-20 left-10 w-32 h-32 bg-blue-500/10 rounded-full blur-xl animate-pulse"></div>
+        <div className="absolute top-40 right-20 w-24 h-24 bg-blue-400/15 rounded-lg rotate-45 blur-lg animate-bounce"></div>
+        <div className="absolute bottom-20 left-1/4 w-40 h-40 bg-blue-300/8 rounded-full blur-2xl animate-pulse"></div>
+        <div className="absolute top-1/2 right-10 w-16 h-16 bg-blue-500/20 rounded-lg rotate-12 blur-md animate-spin"></div>
+        <div className="absolute top-1/3 left-1/4 w-20 h-20 bg-blue-400/12 rounded-full blur-lg animate-pulse" style={{ animationDelay: "1s" }}></div>
+        <div className="absolute bottom-1/3 right-1/4 w-28 h-28 bg-blue-300/10 rounded-lg rotate-30 blur-xl animate-bounce" style={{ animationDelay: "2s" }}></div>
+      </div>
+      
+      <NavigationBar />
+      
+      <main className="relative z-10 pt-24 pb-16">
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="container mx-auto px-4 sm:px-6 lg:px-8"
+        >
+          <CategoryOrderForm 
+            category={mainCategory}
+            onBack={handleBack}
+          />
+        </motion.div>
       </main>
-      <Footer />
+      
+      <FooterComponent />
     </div>
   )
 }

@@ -12,8 +12,6 @@ export default function TestOrder() {
   const testAddOrder = async () => {
     setLoading(true)
     try {
-      console.log('🧪 Testando adição de pedido...')
-      
       const testOrder = {
         customerName: "Cliente Teste",
         customerEmail: "teste@email.com",
@@ -28,12 +26,8 @@ export default function TestOrder() {
         priority: "medium" as const,
         notes: "Pedido de teste"
       }
-
-      console.log('🧪 Dados do pedido:', testOrder)
       
       const result = await addOrder(testOrder)
-      
-      console.log('🧪 Resultado:', result)
       
       if (result) {
         toast({

@@ -163,9 +163,32 @@ const ContactFloating = ({ contacts }: { contacts: any }) => {
  * 4. Comprovante baixa → Pedido criado → Admin notificado
  */
 export default function FreeRecommendations() {
-  const { plans, loading } = usePlans()
+  const { plans, loading, error } = usePlans()
   const [selectedPlan, setSelectedPlan] = useState<any>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
+
+
+
+  // Mostrar erro se houver
+  if (error) {
+    return (
+      <section className="py-16 bg-gradient-to-br from-gray-50 via-white to-blue-50 min-h-screen flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto">
+          <div className="w-16 h-16 bg-gradient-to-r from-red-400 to-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
+            <AlertCircle className="w-8 h-8 text-white" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Erro ao Carregar Planos</h2>
+          <p className="text-gray-600 mb-6">{error}</p>
+          <Button
+            onClick={() => window.location.reload()}
+            className="bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700"
+          >
+            Tentar Novamente
+          </Button>
+        </div>
+      </section>
+    )
+  }
 
   // Mostrar loading enquanto carrega os dados
   if (loading) {
@@ -181,6 +204,7 @@ export default function FreeRecommendations() {
 
   // Se não há planos ativos, mostrar mensagem
   const activePlans = plans.filter(plan => plan.active === true)
+  
   if (activePlans.length === 0) {
     return (
       <section className="py-16 bg-gradient-to-br from-gray-50 via-white to-blue-50 min-h-screen flex items-center justify-center">

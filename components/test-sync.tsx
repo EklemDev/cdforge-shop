@@ -8,25 +8,21 @@ export default function TestSync() {
   const [testValue, setTestValue] = useState('')
 
   useEffect(() => {
-    console.log('🧪 TestSync: Componente montado')
-    console.log('🧪 TestSync: Config inicial:', config)
+    // Componente montado
   }, [])
 
   useEffect(() => {
-    console.log('🧪 TestSync: Config mudou:', config)
+    // Config mudou
   }, [config])
 
   const handleTestUpdate = async () => {
     const newPhone = `(11) ${Math.floor(Math.random() * 90000) + 10000}-${Math.floor(Math.random() * 9000) + 1000}`
-    console.log('🧪 TestSync: Testando atualização com telefone:', newPhone)
     
     const success = await updateConfig({
       phone: newPhone,
       whatsapp: `https://wa.me/55${newPhone.replace(/\D/g, '')}`,
       discordLink: `https://discord.gg/teste${Date.now()}`
     })
-    
-    console.log('🧪 TestSync: Atualização retornou:', success)
   }
 
   if (loading) {

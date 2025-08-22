@@ -267,3 +267,8 @@ O sistema agora oferece uma **experiência premium** com:
 
 **O problema foi completamente resolvido**: o PDF agora só baixa quando o usuário clica em "Enviar Solicitação", proporcionando uma experiência confiável e intuitiva.
 
+
+
+
+
+

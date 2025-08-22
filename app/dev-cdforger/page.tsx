@@ -48,6 +48,7 @@ import {
   X,
   Palette,
   Check,
+  Building2,
 } from "lucide-react"
 
 // FIREBASE IMPORTS - Adicionar quando configurar Firebase
@@ -55,6 +56,8 @@ import {
 // import { collection, addDoc, deleteDoc, doc, updateDoc } from "firebase/firestore"
 import { useOrders } from "@/hooks/useOrders"
 import PlansManager from "@/components/plans-manager"
+import ContactsManager from "@/components/contacts-manager"
+import CompanyInfoManager from "@/components/company-info-manager"
 
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState("dashboard")
@@ -200,7 +203,7 @@ export default function AdminPage() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
-          <TabsList className="grid w-full grid-cols-3 gap-1 glass-effect p-1.5 rounded-xl border border-slate-200/60 shadow-lg">
+          <TabsList className="grid w-full grid-cols-5 gap-1 glass-effect p-1.5 rounded-xl border border-slate-200/60 shadow-lg">
             <TabsTrigger
               value="dashboard"
               className="text-sm font-medium data-[state=active]:bg-white data-[state=active]:shadow-md flex items-center gap-2 cursor-pointer"
@@ -221,6 +224,20 @@ export default function AdminPage() {
             >
               <CreditCard className="w-4 h-4" />
               <span className="hidden sm:inline">Planos</span>
+            </TabsTrigger>
+            <TabsTrigger
+              value="contacts"
+              className="text-sm font-medium data-[state=active]:bg-white data-[state=active]:shadow-md flex items-center gap-2 cursor-pointer"
+            >
+              <Phone className="w-4 h-4" />
+              <span className="hidden sm:inline">Contatos</span>
+            </TabsTrigger>
+            <TabsTrigger
+              value="company"
+              className="text-sm font-medium data-[state=active]:bg-white data-[state=active]:shadow-md flex items-center gap-2 cursor-pointer"
+            >
+              <Building2 className="w-4 h-4" />
+              <span className="hidden sm:inline">Empresa</span>
             </TabsTrigger>
           </TabsList>
 
@@ -699,6 +716,13 @@ export default function AdminPage() {
             <PlansManager />
           </TabsContent>
 
+          <TabsContent value="contacts" className="space-y-6">
+            <ContactsManager />
+          </TabsContent>
+
+          <TabsContent value="company" className="space-y-6">
+            <CompanyInfoManager />
+          </TabsContent>
 
         </Tabs>
       </div>

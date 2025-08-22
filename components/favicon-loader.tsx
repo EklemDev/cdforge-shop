@@ -13,8 +13,8 @@ export default function FaviconLoader() {
           // Adiciona apenas se não existir
           const link = document.createElement('link')
           link.rel = 'icon'
-          link.href = '/logo.png'
-          link.type = 'image/png'
+          link.href = '/logo.svg'
+                      link.type = 'image/svg+xml'
           document.head.appendChild(link)
         }
       } catch (error) {

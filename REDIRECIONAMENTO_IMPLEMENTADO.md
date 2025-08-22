@@ -151,3 +151,8 @@ O sistema agora oferece uma **experiência completa e intuitiva**:
 
 **A funcionalidade foi implementada com sucesso**: o usuário agora é automaticamente redirecionado para a tela de categorias após concluir uma solicitação, permitindo uma experiência contínua e profissional! 🚀
 
+
+
+
+
+

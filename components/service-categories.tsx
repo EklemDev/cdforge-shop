@@ -24,7 +24,7 @@ const services = [
     color: "#EF4444",
     features: ["Remoção automática", "Lista de segurança", "Relatório de ações", "Suporte durante processo"],
     price: "R$ 80",
-    deliveryTime: "2-3 dias",
+    deliveryTime: "1-3 dias",
   },
   {
     id: "social-consulting",
@@ -44,7 +44,7 @@ const services = [
     color: "#25D366",
     features: ["Configuração completa", "Automações básicas", "Templates de mensagens", "Treinamento da equipe"],
     price: "R$ 150",
-    deliveryTime: "3-5 dias",
+    deliveryTime: "1-3 dias",
   },
   {
     id: "technical-support",

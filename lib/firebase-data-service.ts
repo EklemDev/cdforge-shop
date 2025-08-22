@@ -17,9 +17,21 @@ import {
 import { db } from './firebase'
 
 // Interfaces
+export interface Contact {
+  id: string
+  type: 'discord' | 'whatsapp' | 'email' | 'instagram' | 'phone'
+  label: string
+  value: string
+  icon: string
+  active: boolean
+  order: number
+  createdAt: any
+  updatedAt: any
+}
+
 export interface SiteConfig {
   id: string
-  // Informações de Contato
+  // Informações de Contato (legado - será substituído pelo sistema de contatos)
   discordLink: string
   phone: string
   email: string
@@ -326,6 +338,69 @@ class FirebaseDataService {
     return FirebaseDataService.instance
   }
 
+  // ===== CONTATOS =====
+  async getContacts(): Promise<Contact[]> {
+    if (!db) return []
+      
+    try {
+      const querySnapshot = await getDocs(collection(db, 'contacts'))
+      
+      const contacts: Contact[] = []
+      querySnapshot.forEach((doc) => {
+        contacts.push({ id: doc.id, ...doc.data() } as Contact)
+      })
+      
+      return contacts.sort((a, b) => a.order - b.order)
+    } catch (error) {
+      console.error('Erro ao buscar contatos:', error)
+      return []
+    }
+  }
+
+  async addContact(contact: Omit<Contact, 'id' | 'createdAt' | 'updatedAt'>): Promise<Contact> {
+    if (!db) throw new Error('Firebase não inicializado')
+    
+    try {
+      const contactData: Contact = {
+        ...contact,
+        id: `contact_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      }
+      
+      await setDoc(doc(db, 'contacts', contactData.id), contactData)
+      return contactData
+    } catch (error) {
+      console.error('Erro ao adicionar contato:', error)
+      throw error
+    }
+  }
+
+  async updateContact(contactId: string, updates: Partial<Contact>): Promise<void> {
+    if (!db) throw new Error('Firebase não inicializado')
+    
+    try {
+      await updateDoc(doc(db, 'contacts', contactId), {
+        ...updates,
+        updatedAt: serverTimestamp()
+      })
+    } catch (error) {
+      console.error('Erro ao atualizar contato:', error)
+      throw error
+    }
+  }
+
+  async deleteContact(contactId: string): Promise<void> {
+    if (!db) throw new Error('Firebase não inicializado')
+    
+    try {
+      await deleteDoc(doc(db, 'contacts', contactId))
+    } catch (error) {
+      console.error('Erro ao deletar contato:', error)
+      throw error
+    }
+  }
+
   // ===== SITE CONFIG =====
   async getSiteConfig(): Promise<SiteConfig | null> {
     try {
@@ -389,17 +464,15 @@ class FirebaseDataService {
 
   async updateSiteConfig(config: Partial<SiteConfig>): Promise<boolean> {
     try {
-      console.log('🔄 Atualizando SiteConfig:', config)
       const docRef = doc(db!, 'siteConfig', 'main')
       await setDoc(docRef, {
         ...config,
         updatedAt: serverTimestamp(),
         lastUpdated: serverTimestamp()
       }, { merge: true })
-      console.log('✅ SiteConfig atualizado com sucesso')
       return true
     } catch (error) {
-      console.error('❌ Erro ao atualizar configuração do site:', error)
+      console.error('Erro ao atualizar configuração do site:', error)
       return false
     }
   }
@@ -809,19 +882,28 @@ class FirebaseDataService {
 
   // ===== REAL-TIME LISTENERS =====
   onSiteConfigChange(callback: (config: SiteConfig | null) => void) {
-    console.log('👂 Iniciando listener do SiteConfig...')
     return onSnapshot(doc(db!, 'siteConfig', 'main'), (doc) => {
-      console.log('📡 Listener do SiteConfig disparado:', doc.exists() ? 'documento existe' : 'documento não existe')
       if (doc.exists()) {
         const configData = { id: doc.id, ...doc.data() } as SiteConfig
-        console.log('📄 Dados do SiteConfig:', configData)
         callback(configData)
       } else {
-        console.log('❌ Documento SiteConfig não encontrado')
         callback(null)
       }
     }, (error) => {
-      console.error('❌ Erro no listener do SiteConfig:', error)
+      console.error('Erro no listener do SiteConfig:', error)
+    })
+  }
+
+  onContactsChange(callback: (contacts: Contact[]) => void) {
+    const q = query(collection(db!, 'contacts'), orderBy('order', 'asc'))
+    return onSnapshot(q, (querySnapshot) => {
+      const contacts = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as Contact[]
+      callback(contacts)
+    }, (error) => {
+      console.error('Erro no listener de Contatos:', error)
     })
   }
 
@@ -975,16 +1057,18 @@ class FirebaseDataService {
     })
   }
 
-  // ===== PLANOS =====
+    // ===== PLANOS =====
   async getPlans(): Promise<Plan[]> {
     if (!db) return []
-    
+      
     try {
       const querySnapshot = await getDocs(collection(db, 'plans'))
+      
       const plans: Plan[] = []
       querySnapshot.forEach((doc) => {
         plans.push({ id: doc.id, ...doc.data() } as Plan)
       })
+      
       return plans.sort((a, b) => a.order - b.order)
     } catch (error) {
       console.error('Erro ao buscar planos:', error)

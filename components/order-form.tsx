@@ -2,16 +2,23 @@
 
 import { useState } from "react"
 import { useOrders } from "@/hooks/useOrders"
-import { usePricingSync } from "@/hooks/usePricingSync"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Badge } from "@/components/ui/badge"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Bot, Globe, Palette, Check, Send, AlertCircle } from "lucide-react"
+import { 
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { 
+  Rocket,
+  CheckCircle,
+  Sparkles,
+  Download,
+  MessageCircle
+} from "lucide-react"
 
 interface OrderFormProps {
   preSelectedCategory?: string
@@ -20,306 +27,265 @@ interface OrderFormProps {
 
 export default function OrderForm({ preSelectedCategory, preSelectedProjectType }: OrderFormProps) {
   const { addOrder } = useOrders()
-  const { getActivePlans } = usePricingSync()
-  
-  const [formData, setFormData] = useState({
-    customerName: "",
-    customerEmail: "",
-    customerPhone: "",
-    projectType: preSelectedProjectType || "",
-    category: preSelectedCategory || "",
-    description: "",
-    budget: "",
-    timeline: "",
-    priority: "medium" as "low" | "medium" | "high"
-  })
   
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState("")
+  const [downloadState, setDownloadState] = useState<'idle' | 'downloading' | 'completed'>('idle')
+  const [downloadProgress, setDownloadProgress] = useState(0)
 
-  const botPlans = getActivePlans('bots')
-  const sitePlans = getActivePlans('sites')
-  const designPlans = getActivePlans('design')
+  const getCategoryColor = () => {
+    const category = preSelectedCategory?.toLowerCase() || 'default'
+    switch (category) {
+      case "bots": return "from-blue-500 to-cyan-500"
+      case "sites": return "from-green-500 to-emerald-500"
+      case "design": return "from-purple-500 to-pink-500"
+      case "assistência": return "from-orange-500 to-red-500"
+      default: return "from-blue-500 to-purple-500"
+    }
+  }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  // Função para gerar e baixar o PDF
+  const generateAndDownloadPDF = async () => {
+    try {
+      setDownloadState('downloading')
+      setDownloadProgress(0)
+      
+      // Simular progresso de download
+      const progressInterval = setInterval(() => {
+        setDownloadProgress(prev => {
+          if (prev >= 90) {
+            clearInterval(progressInterval)
+            return 90
+          }
+          return prev + 10
+        })
+      }, 100)
+
+      // Importar jsPDF dinamicamente
+      const { default: jsPDF } = await import('jspdf')
+      
+      const doc = new jsPDF()
+      doc.setFont("helvetica")
+      doc.setFontSize(20)
+      
+      // Título principal
+      doc.setTextColor(59, 130, 246)
+      doc.text("COMPROVANTE DE SOLICITAÇÃO", 105, 30, { align: "center" })
+      
+      // Linha separadora
+      doc.setDrawColor(59, 130, 246)
+      doc.setLineWidth(0.5)
+      doc.line(20, 40, 190, 40)
+      
+      // Informações do comprovante
+      doc.setFontSize(12)
+      doc.setTextColor(0, 0, 0)
+      
+      const currentDate = new Date()
+      const formattedDate = currentDate.toLocaleDateString('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      })
+      
+      const data = [
+        { label: "Data e Hora:", value: formattedDate },
+        { label: "Categoria:", value: preSelectedCategory || "Não especificada" },
+        { label: "Tipo de Projeto:", value: preSelectedProjectType || "Não especificado" },
+      ]
+      
+      let yPosition = 60
+      data.forEach((item) => {
+        doc.setFont("helvetica", "bold")
+        doc.text(item.label, 20, yPosition)
+        
+        doc.setFont("helvetica", "normal")
+        const valueX = 20 + doc.getTextWidth(item.label) + 5
+        doc.text(item.value, valueX, yPosition)
+        
+        yPosition += 15
+      })
+      
+      // Status da solicitação
+      yPosition += 10
+      doc.setFont("helvetica", "bold")
+      doc.setTextColor(59, 130, 246)
+      doc.text("Status da Solicitação", 20, yPosition)
+      
+      doc.setFont("helvetica", "normal")
+      doc.setTextColor(0, 0, 0)
+      yPosition += 10
+      doc.text("✅ Solicitação recebida com sucesso", 20, yPosition)
+      yPosition += 8
+      doc.text("⏳ Aguardando análise da equipe", 20, yPosition)
+      yPosition += 8
+      doc.text("📞 Entraremos em contato em breve", 20, yPosition)
+      
+      // Rodapé
+      yPosition += 20
+      doc.setFontSize(10)
+      doc.setTextColor(107, 114, 128)
+      doc.text("CodeForge - Transformando ideias em realidade", 105, yPosition, { align: "center" })
+      
+      // Gerar nome do arquivo
+      const fileName = `comprovante_${preSelectedCategory?.toLowerCase() || 'geral'}_${currentDate.toISOString().split('T')[0]}.pdf`
+      
+      setDownloadProgress(100)
+      await new Promise(resolve => setTimeout(resolve, 500))
+      
+      doc.save(fileName)
+      await new Promise(resolve => setTimeout(resolve, 800))
+      
+      setDownloadState('completed')
+      
+    } catch (error) {
+      console.error('Erro ao gerar PDF:', error)
+      alert('Erro ao gerar o comprovante. Tente novamente.')
+      setDownloadState('idle')
+    }
+  }
+
+  const handleSubmit = async () => {
     setLoading(true)
     setError("")
     setSuccess(false)
 
     try {
       const orderId = await addOrder({
-        ...formData,
+        customerName: "Cliente",
+        customerEmail: "",
+        customerPhone: "",
+        projectType: preSelectedProjectType || "",
+        category: preSelectedCategory || "",
+        description: `Solicitação de ${preSelectedCategory || 'serviço'}`,
+        budget: "",
+        timeline: "",
+        priority: "medium" as "low" | "medium" | "high",
         status: 'pending',
         assignedTo: '',
-        notes: ''
+        notes: `Solicitação simplificada - Cliente deve entrar em contato via WhatsApp`
       })
 
       if (orderId) {
+        await generateAndDownloadPDF()
         setSuccess(true)
-        setFormData({
-          customerName: "",
-          customerEmail: "",
-          customerPhone: "",
-          projectType: "",
-          category: "",
-          description: "",
-          budget: "",
-          timeline: "",
-          priority: "medium"
-        })
       } else {
         setError("Erro ao enviar pedido. Tente novamente.")
       }
     } catch (err) {
       setError("Erro ao enviar pedido. Tente novamente.")
+      setDownloadState('idle')
     } finally {
       setLoading(false)
     }
   }
 
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
-  }
-
-  const getPlansByCategory = (category: string) => {
-    switch (category) {
-      case 'bots':
-        return botPlans
-      case 'sites':
-        return sitePlans
-      case 'design':
-        return designPlans
-      default:
-        return []
-    }
-  }
-
   return (
-    <Card className="w-full max-w-2xl mx-auto">
-      <CardHeader>
-        <CardTitle className="text-2xl font-bold text-center">
-          Solicitar Orçamento
-        </CardTitle>
-        <CardDescription className="text-center">
-          Preencha o formulário abaixo e entraremos em contato em até 24 horas
-        </CardDescription>
-      </CardHeader>
-      
-      <CardContent>
-        {success && (
-          <Alert className="mb-6 border-green-200 bg-green-50 text-green-800">
-            <Check className="h-4 w-4" />
-            <AlertDescription>
-              Pedido enviado com sucesso! Entraremos em contato em breve.
-            </AlertDescription>
-          </Alert>
-        )}
-
-        {error && (
-          <Alert className="mb-6 border-red-200 bg-red-50 text-red-800">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Informações do Cliente */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-slate-900">Informações Pessoais</h3>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="customerName">Nome Completo *</Label>
-                <Input
-                  id="customerName"
-                  value={formData.customerName}
-                  onChange={(e) => handleInputChange('customerName', e.target.value)}
-                  required
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="customerEmail">E-mail *</Label>
-                <Input
-                  id="customerEmail"
-                  type="email"
-                  value={formData.customerEmail}
-                  onChange={(e) => handleInputChange('customerEmail', e.target.value)}
-                  required
-                />
-              </div>
+    <>
+      <Card className="w-full max-w-2xl mx-auto shadow-2xl border-0 overflow-hidden">
+        <CardContent className="p-12">
+          {/* Ícone e Título */}
+          <div className="text-center mb-8">
+            <div className={`w-24 h-24 bg-gradient-to-r ${getCategoryColor()} rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl`}>
+              <Rocket className="w-12 h-12 text-white" />
             </div>
             
-            <div>
-              <Label htmlFor="customerPhone">Telefone *</Label>
-              <Input
-                id="customerPhone"
-                value={formData.customerPhone}
-                onChange={(e) => handleInputChange('customerPhone', e.target.value)}
-                required
-              />
-            </div>
+            <h1 className="text-4xl font-bold text-gray-900 mb-4">
+              Tudo certo até aqui! 🚀
+            </h1>
+            
+            <p className="text-xl text-gray-600 mb-8">
+              Envie sua solicitação e baixe o comprovante.
+            </p>
           </div>
 
-          {/* Tipo de Projeto */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-slate-900">Tipo de Projeto</h3>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div
-                className={`p-4 border rounded-lg cursor-pointer transition-all ${
-                  formData.category === 'bots' 
-                    ? 'border-blue-500 bg-blue-50' 
-                    : 'border-gray-200 hover:border-gray-300'
-                }`}
-                onClick={() => handleInputChange('category', 'bots')}
-              >
-                <div className="flex items-center space-x-2 mb-2">
-                  <Bot className="w-5 h-5 text-blue-600" />
-                  <span className="font-medium">Bots Discord</span>
-                </div>
-                <p className="text-sm text-gray-600">Bots inteligentes para seu servidor</p>
-              </div>
-              
-              <div
-                className={`p-4 border rounded-lg cursor-pointer transition-all ${
-                  formData.category === 'sites' 
-                    ? 'border-green-500 bg-green-50' 
-                    : 'border-gray-200 hover:border-gray-300'
-                }`}
-                onClick={() => handleInputChange('category', 'sites')}
-              >
-                <div className="flex items-center space-x-2 mb-2">
-                  <Globe className="w-5 h-5 text-green-600" />
-                  <span className="font-medium">Sites Web</span>
-                </div>
-                <p className="text-sm text-gray-600">Sites profissionais e responsivos</p>
-              </div>
-              
-              <div
-                className={`p-4 border rounded-lg cursor-pointer transition-all ${
-                  formData.category === 'design' 
-                    ? 'border-purple-500 bg-purple-50' 
-                    : 'border-gray-200 hover:border-gray-300'
-                }`}
-                onClick={() => handleInputChange('category', 'design')}
-              >
-                <div className="flex items-center space-x-2 mb-2">
-                  <Palette className="w-5 h-5 text-purple-600" />
-                  <span className="font-medium">Design Gráfico</span>
-                </div>
-                <p className="text-sm text-gray-600">Identidade visual e materiais</p>
+          {/* Mensagem Adicional */}
+          <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-2xl border border-blue-100 mb-8">
+            <div className="flex items-start gap-3">
+              <MessageCircle className="w-6 h-6 text-blue-500 mt-1 flex-shrink-0" />
+              <div>
+                <p className="text-gray-700 text-lg leading-relaxed">
+                  Entre em contato e envie seu comprovante via WhatsApp para garantir uma resposta mais rápida e segura.
+                </p>
               </div>
             </div>
           </div>
 
-          {/* Plano Escolhido */}
-          {formData.category && (
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-slate-900">Plano Escolhido</h3>
-              
-              <Select
-                value={formData.projectType}
-                onValueChange={(value) => handleInputChange('projectType', value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione um plano" />
-                </SelectTrigger>
-                <SelectContent>
-                  {getPlansByCategory(formData.category).map((plan) => (
-                    <SelectItem key={plan.id} value={plan.name}>
-                      <div className="flex items-center justify-between w-full">
-                        <span>{plan.name}</span>
-                        <Badge variant="outline" className="ml-2">
-                          R$ {plan.price.toLocaleString('pt-BR')}
-                        </Badge>
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+          {/* Botão Principal */}
+          <div className="text-center">
+            <Button
+              onClick={handleSubmit}
+              disabled={loading || downloadState === 'downloading'}
+              className={`w-full py-6 text-xl bg-gradient-to-r ${getCategoryColor()} text-white hover:shadow-2xl transition-all duration-300 rounded-2xl font-bold text-lg`}
+              size="lg"
+            >
+              {loading ? (
+                <div className="flex items-center gap-3">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+                  Enviando solicitação...
+                </div>
+              ) : downloadState === 'downloading' ? (
+                <div className="flex items-center gap-3">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+                  Baixando Comprovante...
+                  <span className="text-sm">({downloadProgress}%)</span>
+                </div>
+              ) : downloadState === 'completed' ? (
+                <div className="flex items-center gap-3">
+                  <CheckCircle className="w-6 h-6" />
+                  Concluído!
+                  <Sparkles className="w-5 h-5" />
+                </div>
+              ) : (
+                <div className="flex items-center gap-3">
+                  <Download className="w-6 h-6" />
+                  Enviar Solicitação e Baixar Comprovante
+                  <Sparkles className="w-5 h-5" />
+                </div>
+              )}
+            </Button>
+          </div>
+
+          {/* Mensagem de erro */}
+          {error && (
+            <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-red-700 text-center">{error}</p>
             </div>
           )}
+        </CardContent>
+      </Card>
 
-          {/* Detalhes do Projeto */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-slate-900">Detalhes do Projeto</h3>
-            
-            <div>
-              <Label htmlFor="description">Descrição do Projeto *</Label>
-              <Textarea
-                id="description"
-                value={formData.description}
-                onChange={(e) => handleInputChange('description', e.target.value)}
-                placeholder="Descreva detalhadamente o que você precisa..."
-                rows={4}
-                required
-              />
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="budget">Orçamento Estimado (R$)</Label>
-                <Input
-                  id="budget"
-                  type="number"
-                  value={formData.budget}
-                  onChange={(e) => handleInputChange('budget', e.target.value)}
-                  placeholder="Ex: 1000"
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="timeline">Prazo Desejado</Label>
-                <Input
-                  id="timeline"
-                  value={formData.timeline}
-                  onChange={(e) => handleInputChange('timeline', e.target.value)}
-                  placeholder="Ex: 2 semanas"
-                />
-              </div>
-            </div>
-            
-            <div>
-              <Label htmlFor="priority">Prioridade</Label>
-              <Select
-                value={formData.priority}
-                onValueChange={(value: "low" | "medium" | "high") => handleInputChange('priority', value)}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="low">Baixa</SelectItem>
-                  <SelectItem value="medium">Média</SelectItem>
-                  <SelectItem value="high">Alta</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+      {/* Dialog de Sucesso */}
+      <Dialog open={success} onOpenChange={setSuccess}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-green-600 text-xl">
+              <CheckCircle className="w-6 h-6" />
+              Solicitação Enviada com Sucesso! 🎉
+            </DialogTitle>
+            <DialogDescription className="text-base leading-relaxed">
+              Sua solicitação foi enviada com sucesso! Entre em contato via WhatsApp e envie seu comprovante para uma resposta mais rápida.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+            <h4 className="font-semibold text-green-800 mb-2">Próximos passos:</h4>
+            <ul className="text-sm text-green-700 space-y-1">
+              <li>• Baixe o comprovante (já feito)</li>
+              <li>• Entre em contato via WhatsApp</li>
+              <li>• Envie o comprovante</li>
+              <li>• Receba resposta em até 24h</li>
+            </ul>
           </div>
-
-          <Button
-            type="submit"
-            className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
-            size="lg"
-            disabled={loading}
-          >
-            {loading ? (
-              <>
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                Enviando...
-              </>
-            ) : (
-              <>
-                <Send className="w-4 h-4 mr-2" />
-                Enviar Solicitação
-              </>
-            )}
-          </Button>
-        </form>
-      </CardContent>
-    </Card>
+          <DialogFooter>
+            <Button onClick={() => setSuccess(false)} className="w-full">
+              Fechar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   )
 }

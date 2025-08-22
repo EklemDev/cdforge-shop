@@ -4,10 +4,9 @@ import { Inter } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import FaviconLoader from "@/components/favicon-loader"
-import UpdateIndicator from "@/components/update-indicator"
+
 import LoadingSpinner from "@/components/loading-spinner"
 import MobileOptimizer from "@/components/mobile-optimizer"
-import PreloadOptimizer from "@/components/preload-optimizer"
 
 // Otimização da fonte - pré-carregamento e display swap
 const inter = Inter({ 
@@ -24,11 +23,11 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://codeforge.vercel.app'),
   icons: {
     icon: [
-      { url: '/logo.png', type: 'image/png', sizes: '32x32' },
-      { url: '/logo.png', type: 'image/png', sizes: '16x16' },
+              { url: '/logo.svg', type: 'image/svg+xml', sizes: '32x32' },
+        { url: '/logo.svg', type: 'image/svg+xml', sizes: '16x16' },
     ],
-    shortcut: '/logo.png',
-    apple: '/logo.png',
+          shortcut: '/logo.svg',
+      apple: '/logo.svg',
   },
   openGraph: {
     title: "CodeForge - Transformando ideias em soluções digitais",
@@ -37,7 +36,7 @@ export const metadata: Metadata = {
     locale: "pt_BR",
     images: [
       {
-        url: '/logo.png',
+        url: '/logo.svg',
         width: 1200,
         height: 630,
         alt: 'CodeForge Logo',
@@ -48,7 +47,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "CodeForge - Transformando ideias em soluções digitais",
     description: "Bots inteligentes, sites profissionais e serviços especializados para impulsionar seu negócio",
-    images: ['/logo.png'],
+          images: ['/logo.svg'],
   },
   robots: {
     index: true,
@@ -75,19 +74,16 @@ export default function RootLayout({
     <html lang="pt-BR" suppressHydrationWarning>
       <head>
         {/* Preload crítico para performance */}
-        <link rel="preload" href="/logo.png" as="image" type="image/png" />
+        <link rel="preload" href="/logo.svg" as="image" type="image/svg+xml" />
         <link rel="dns-prefetch" href="//fonts.googleapis.com" />
         <link rel="dns-prefetch" href="//fonts.gstatic.com" />
       </head>
       <body className={inter.className}>
         <FaviconLoader />
-        <UpdateIndicator />
         <LoadingSpinner show={false} />
         <MobileOptimizer />
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} disableTransitionOnChange={true}>
-          <PreloadOptimizer>
-            {children}
-          </PreloadOptimizer>
+          {children}
         </ThemeProvider>
       </body>
     </html>

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Bot, Globe, Palette, Settings } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
+import { CodeForgeLogoEnhanced } from "./codeforge-logo-enhanced"
 import FirebaseDataService from "@/lib/firebase-data-service"
 import { MainCategory } from "@/lib/firebase-data-service"
 
@@ -72,14 +73,7 @@ export default function MainCategorySelection() {
         <div className="flex items-center justify-center mb-8 group">
           <div className="relative mr-3">
             <div className="bg-white dark:bg-gray-700 p-2 rounded-full shadow-lg border border-gray-200 dark:border-gray-600 group-hover:scale-105 transition-all duration-300">
-              <Image 
-                src="/logo.png" 
-                alt="CodeForge Logo" 
-                width={32} 
-                height={32} 
-                className="w-8 h-8"
-                style={{ willChange: 'transform' }}
-              />
+              <CodeForgeLogoEnhanced size={32} />
             </div>
           </div>
           <h1 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400">

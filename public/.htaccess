@@ -1,14 +1,14 @@
-# Força o Firefox a reconhecer PNG como favicon
-<Files "logo.png">
-    Header set Content-Type "image/png"
+# Força o Firefox a reconhecer SVG como favicon
+<Files "logo.svg">
+    Header set Content-Type "image/svg+xml"
     Header set Cache-Control "public, max-age=31536000"
 </Files>
 
 # Configuração específica para favicon
-<Files "logo.png">
+<Files "logo.svg">
     Header set X-Content-Type-Options "nosniff"
 </Files>
 
-# Redireciona favicon.ico para logo.png
+# Redireciona favicon.ico para logo.svg
 RewriteEngine On
-RewriteRule ^favicon\.ico$ /logo.png [L,R=301]
+RewriteRule ^favicon\.ico$ /logo.svg [L,R=301]

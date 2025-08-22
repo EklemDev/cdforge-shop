@@ -279,6 +279,39 @@ export default function OrdersManager() {
                   </p>
                 </div>
 
+                {/* Atalhos Selecionados */}
+                {order.selectedShortcuts && order.selectedShortcuts.length > 0 && (
+                  <div className="mb-4">
+                    <h4 className="font-medium mb-2">🚀 Atalhos Selecionados:</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {order.selectedShortcuts.map((shortcut, index) => (
+                        <Badge key={index} variant="secondary" className="text-xs">
+                          {shortcut}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Descrição Detalhada do Projeto */}
+                {order.projectDescription && (
+                  <div className="mb-4">
+                    <h4 className="font-medium mb-2">📝 Descrição Detalhada:</h4>
+                    <div className="space-y-2">
+                      {order.projectDescription.howItShouldBe && (
+                        <div className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
+                          <span className="font-medium">Como deve ser:</span> {order.projectDescription.howItShouldBe}
+                        </div>
+                      )}
+                      {order.projectDescription.howItShouldBeDone && (
+                        <div className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
+                          <span className="font-medium">Como deve ser feito:</span> {order.projectDescription.howItShouldBeDone}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
                 {order.notes && (
                   <div className="mb-4">
                     <h4 className="font-medium mb-2">Notas:</h4>

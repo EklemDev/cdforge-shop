@@ -62,3 +62,8 @@ async function addTestCategories() {
 // Executar o script
 addTestCategories()
 
+
+
+
+
+

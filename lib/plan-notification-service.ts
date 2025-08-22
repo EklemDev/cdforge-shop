@@ -1,24 +1,4 @@
-import FirebaseDataService from './firebase-data-service'
-
-export interface PlanOrder {
-  id: string
-  planId: string
-  planName: string
-  planPrice: number
-  testDays: number
-  promotion?: {
-    active: boolean
-    type: 'percentage' | 'fixed'
-    value: number
-    description: string
-  }
-  customerName?: string
-  customerEmail?: string
-  customerPhone?: string
-  status: 'pending' | 'confirmed' | 'cancelled'
-  createdAt: Date
-  updatedAt: Date
-}
+import FirebaseDataService, { PlanOrder } from './firebase-data-service'
 
 /**
  * Serviço responsável por gerenciar pedidos de planos e notificações

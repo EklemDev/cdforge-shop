@@ -8,16 +8,13 @@ import { Cpu, Code, Terminal, Handshake, Users, Shield } from "lucide-react"
 import { useState } from "react"
 import DevKeyModal from "./dev-key-modal"
 import { useSiteConfig } from "@/hooks/useFirebaseData"
+import ContactPlatforms from "./contact-platforms"
+import { CodeForgeLogoEnhanced } from "./codeforge-logo-enhanced"
 
 export default function Footer() {
   const router = useRouter()
   const [isDevModalOpen, setIsDevModalOpen] = useState(false)
   const { config, loading, error } = useSiteConfig()
-  
-  // Debug: mostrar dados atuais
-  console.log('🔍 Footer - Config atual:', config)
-  console.log('🔍 Footer - Loading:', loading)
-  console.log('🔍 Footer - Error:', error)
 
   return (
     <footer className="bg-gray-900 dark:bg-black text-white py-12 transition-colors">
@@ -26,22 +23,11 @@ export default function Footer() {
           {/* Logo and Description */}
           <div className="md:col-span-1">
             <div className="flex items-center space-x-2 mb-4">
-              <Image src="/logo.png" alt="CodeForge Logo" width={24} height={24} className="w-6 h-6" />
+              <CodeForgeLogoEnhanced size={24} />
               <span className="text-xl font-bold">CodeForge</span>
             </div>
             <p className="text-gray-400 mb-4">Transformando ideias em soluções digitais inovadoras.</p>
-            <div className="space-y-2">
-              <Button asChild className="bg-blue-500 hover:bg-blue-600 text-white w-full">
-                <a href={config?.discordLink || 'https://discord.gg/jp2BzA4H'} target="_blank" rel="noopener noreferrer">
-                  Entrar no Discord
-                </a>
-              </Button>
-              <Button asChild className="bg-green-500 hover:bg-green-600 text-white w-full">
-                <a href={config?.whatsapp || "https://wa.me/5511966485110"} target="_blank" rel="noopener noreferrer">
-                  Contato WhatsApp
-                </a>
-              </Button>
-            </div>
+            <ContactPlatforms variant="footer" />
           </div>
 
           {/* Quick Links */}
@@ -124,12 +110,12 @@ export default function Footer() {
             <h3 className="text-lg font-semibold mb-4">Serviços</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/servicos" className="text-gray-400 hover:text-blue-400 transition-colors">
+                <Link href="/categorias" className="text-gray-400 hover:text-blue-400 transition-colors">
                   Consultoria
                 </Link>
               </li>
               <li>
-                <Link href="/servicos" className="text-gray-400 hover:text-blue-400 transition-colors">
+                <Link href="/categorias" className="text-gray-400 hover:text-blue-400 transition-colors">
                   Suporte Técnico
                 </Link>
               </li>
@@ -188,15 +174,6 @@ export default function Footer() {
                          Contatar no Discord
                        </a>
                      </Button>
-                     <Button 
-                       asChild 
-                       size="sm" 
-                       className="w-full bg-green-600 hover:bg-green-700 text-white"
-                     >
-                       <a href={config?.whatsapp || "https://wa.me/5511966485110"} target="_blank" rel="noopener noreferrer">
-                         WhatsApp
-                       </a>
-                     </Button>
                    </div>
                 </div>
               </div>
@@ -231,15 +208,6 @@ export default function Footer() {
                         Contatar no Discord
                       </a>
                     </Button>
-                                         <Button 
-                       asChild 
-                       size="sm" 
-                       className="w-full bg-green-600 hover:bg-green-700 text-white"
-                     >
-                       <a href={config?.whatsapp || "https://wa.me/5511966485110"} target="_blank" rel="noopener noreferrer">
-                         WhatsApp
-                       </a>
-                     </Button>
                   </div>
                 </div>
               </div>
@@ -272,15 +240,6 @@ export default function Footer() {
                     >
                       <a href={config?.discordLink || "https://discord.gg/jp2BzA4H"} target="_blank" rel="noopener noreferrer">
                         Contatar no Discord
-                      </a>
-                    </Button>
-                    <Button 
-                      asChild 
-                      size="sm" 
-                      className="w-full bg-green-500 hover:bg-green-600 text-white"
-                    >
-                      <a href={config?.whatsapp || "https://wa.me/5511966485110"} target="_blank" rel="noopener noreferrer">
-                        WhatsApp
                       </a>
                     </Button>
                   </div>

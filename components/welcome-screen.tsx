@@ -3,8 +3,9 @@
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
-import { useCallback, useMemo } from "react"
+import { useCallback, useMemo, useState } from "react"
 import { Code, Cpu, Terminal, MessageCircle, Users, Handshake, MapPin, Clock } from "lucide-react"
+import { CodeForgeLogoEnhanced } from "./codeforge-logo-enhanced"
 
 import { useFounders } from "@/hooks/useFirebaseData"
 
@@ -18,6 +19,7 @@ const iconMap = {
 export default function WelcomeScreen() {
   const router = useRouter()
   const { founders, loading } = useFounders()
+  const [currentStep, setCurrentStep] = useState(0)
   
   // Otimização: Callbacks memoizados para evitar re-renders
   const handleDiscordClick = useCallback(() => {
@@ -42,8 +44,8 @@ export default function WelcomeScreen() {
       {/* Geometric Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-20 left-10 w-32 h-32 bg-blue-500/10 dark:bg-blue-400/20 rounded-full blur-xl animate-pulse"></div>
-        <div className="absolute top-40 right-20 w-24 h-24 bg-purple-500/15 dark:bg-purple-400/25 rounded-lg rotate-45 blur-lg animate-bounce"></div>
-        <div className="absolute bottom-20 left-1/4 w-40 h-40 bg-cyan-500/8 dark:bg-cyan-400/15 rounded-full blur-2xl animate-pulse"></div>
+        <div className="absolute top-40 right-20 w-24 h-24 bg-blue-400/15 dark:bg-blue-300/25 rounded-lg rotate-45 blur-lg animate-bounce"></div>
+        <div className="absolute bottom-20 left-1/4 w-40 h-40 bg-blue-300/8 dark:bg-blue-200/15 rounded-full blur-2xl animate-pulse"></div>
         <div className="absolute top-1/2 right-10 w-16 h-16 bg-blue-500/20 dark:bg-blue-400/30 rounded-lg rotate-12 blur-md animate-spin"></div>
       </div>
 
@@ -51,28 +53,11 @@ export default function WelcomeScreen() {
         <div className="text-center max-w-5xl mx-auto">
           {/* Logo e Nome CodeForge com Efeitos Épicos */}
           <div className="flex flex-col sm:flex-row items-center justify-center mb-16 group">
-            {/* Logo com Efeitos */}
+            {/* Logo Branca */}
             <div className="relative mb-4 sm:mb-0 sm:mr-6">
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500 rounded-full blur-lg opacity-60 animate-pulse group-hover:opacity-80 transition-opacity duration-500"></div>
-              <div className="relative bg-gradient-to-br from-white to-gray-100 dark:from-gray-800 dark:to-gray-900 p-4 sm:p-6 rounded-full shadow-2xl border-2 border-blue-500/30 dark:border-blue-400/40 group-hover:scale-110 group-hover:rotate-12 transition-all duration-700 ease-out">
-                <Image
-                  src="/logo.png"
-                  alt="CodeForge Logo"
-                  width={80}
-                  height={80}
-                  priority
-                  className="w-16 h-16 sm:w-20 sm:h-20 drop-shadow-2xl filter brightness-110 contrast-110 group-hover:brightness-125 group-hover:contrast-125 transition-all duration-500"
-                  style={{ 
-                    transform: 'translateZ(0)', // Força aceleração de hardware
-                    willChange: 'transform, filter' // Otimização para animações
-                  }}
-                />
+              <div className="relative bg-gradient-to-br from-blue-900/90 to-blue-800/80 p-4 sm:p-6 rounded-full shadow-2xl border-2 border-blue-400/30 group-hover:scale-110 group-hover:rotate-12 transition-all duration-700 ease-out">
+                <CodeForgeLogoEnhanced size={80} color="white" />
               </div>
-              {/* Efeito de Brilho Rotativo na Logo */}
-              <div
-                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent rounded-full animate-spin opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                style={{ animationDuration: "3s" }}
-              ></div>
             </div>
 
             {/* Nome CodeForge com Efeitos Épicos */}
@@ -97,12 +82,12 @@ export default function WelcomeScreen() {
               
               <h1 className="text-4xl sm:text-6xl lg:text-7xl xl:text-8xl font-black relative">
                 {/* Texto com Gradiente Animado */}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 via-cyan-500 to-blue-600 animate-gradient-x bg-300% font-extrabold tracking-tight">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-blue-500 via-blue-400 to-blue-600 animate-gradient-x bg-300% font-extrabold tracking-tight">
                   CodeForge
                 </span>
 
                 {/* Efeito de Brilho no Texto */}
-                <span className="absolute inset-0 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-white via-cyan-400 to-blue-400 opacity-0 group-hover:opacity-60 animate-shimmer bg-300% font-extrabold tracking-tight transition-opacity duration-700">
+                <span className="absolute inset-0 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-white via-blue-300 to-blue-400 opacity-0 group-hover:opacity-60 animate-shimmer bg-300% font-extrabold tracking-tight transition-opacity duration-700">
                   CodeForge
                 </span>
 
@@ -118,8 +103,8 @@ export default function WelcomeScreen() {
               {/* Partículas de Energia */}
               <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
                 <div className="absolute top-2 left-4 w-2 h-2 bg-blue-400 rounded-full animate-ping"></div>
-                <div className="absolute top-8 right-8 w-1 h-1 bg-purple-400 rounded-full animate-pulse"></div>
-                <div className="absolute bottom-4 left-12 w-1.5 h-1.5 bg-cyan-400 rounded-full animate-bounce"></div>
+                <div className="absolute top-8 right-8 w-1 h-1 bg-blue-300 rounded-full animate-pulse"></div>
+                <div className="absolute bottom-4 left-12 w-1.5 h-1.5 bg-blue-200 rounded-full animate-bounce"></div>
                 <div
                   className="absolute top-12 right-4 w-1 h-1 bg-blue-300 rounded-full animate-ping"
                   style={{ animationDelay: "0.5s" }}
@@ -143,7 +128,7 @@ export default function WelcomeScreen() {
           </p>
 
           {/* Botões de Ação Otimizados */}
-          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-12">
+          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-8">
             <Button
               size="lg"
               onClick={() => router.push('/categorias')}
@@ -166,8 +151,86 @@ export default function WelcomeScreen() {
                 touchAction: 'manipulation'
               }}
             >
-              💬 Falar no Discord
+              Falar no Discord
             </Button>
+          </div>
+
+          {/* Progress Bar - Etapas do Processo */}
+          <div className="mb-12 max-w-2xl mx-auto">
+            <div className="text-center mb-6">
+              <h3 className="text-lg sm:text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                Processo Simplificado
+              </h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                4 etapas para transformar sua ideia em realidade
+              </p>
+            </div>
+            
+            {/* Progress Bar with Segments */}
+            <div className="flex justify-center w-full mb-4">
+              <div className="w-full h-2 sm:h-3 flex rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700">
+                {[
+                  { label: "Escolha", icon: "🎯", description: "Selecione o tipo de solução que melhor atende suas necessidades" },
+                  { label: "Personalize", icon: "⚙️", description: "Configure e adapte a solução ao seu projeto específico" },
+                  { label: "Desenvolva", icon: "🚀", description: "Nossa equipe desenvolve sua solução com qualidade e agilidade" },
+                  { label: "Lance", icon: "✨", description: "Sua solução é implementada e está pronta para uso" }
+                ].map((step, index) => (
+                  <div
+                    key={index}
+                    onClick={() => setCurrentStep(index)}
+                    className={`flex-1 transition-all duration-500 ease-out cursor-pointer hover:bg-blue-400/60 ${
+                      index <= currentStep 
+                        ? "bg-gradient-to-r from-blue-500 to-purple-500 shadow-sm" 
+                        : "bg-gray-300 dark:bg-gray-600"
+                    }`}
+                    style={{
+                      marginRight: index < 3 ? '2px' : '0'
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+            
+            {/* Step Description */}
+            <div className="text-center mt-4 mb-6">
+              <p className="text-sm text-gray-600 dark:text-gray-400 max-w-md mx-auto">
+                {[
+                  { label: "Escolha", icon: "🎯", description: "Selecione o tipo de solução que melhor atende suas necessidades" },
+                  { label: "Personalize", icon: "⚙️", description: "Configure e adapte a solução ao seu projeto específico" },
+                  { label: "Desenvolva", icon: "🚀", description: "Nossa equipe desenvolve sua solução com qualidade e agilidade" },
+                  { label: "Lance", icon: "✨", description: "Sua solução é implementada e está pronta para uso" }
+                ][currentStep].description}
+              </p>
+            </div>
+
+            {/* Navigation Buttons */}
+            <div className="flex items-center justify-center gap-4">
+              <button
+                onClick={() => setCurrentStep(currentStep === 0 ? 3 : currentStep - 1)}
+                className="w-12 h-12 bg-blue-500 hover:bg-blue-600 rounded-full flex items-center justify-center text-white transition-all duration-300 hover:scale-110 shadow-lg"
+                aria-label="Etapa anterior"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+
+              <div className="text-center px-4 py-2 bg-gray-100 dark:bg-gray-800 rounded-lg min-w-[100px]">
+                <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                  {currentStep + 1} de 4
+                </span>
+              </div>
+
+              <button
+                onClick={() => setCurrentStep((currentStep + 1) % 4)}
+                className="w-12 h-12 bg-blue-500 hover:bg-blue-600 rounded-full flex items-center justify-center text-white transition-all duration-300 hover:scale-110 shadow-lg"
+                aria-label="Próxima etapa"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
           </div>
 
           {/* Seção Simplificada de Fundadores */}
